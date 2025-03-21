@@ -109,7 +109,7 @@ class DynamicTableDateTimeInput extends DynamicTableInputType<DateTime> {
                     children: [
                       Expanded(
                         child: Text(
-                          "Date: ${currentValue != null ? "${currentValue.day.toString().padLeft(2, '0')}-${currentValue.month.toString().padLeft(2, '0')}-${currentValue.year}" : "Select date"}",
+                          "${currentValue != null ? "${currentValue.day.toString().padLeft(2, '0')}-${currentValue.month.toString().padLeft(2, '0')}-${currentValue.year}" : "Select date"}",
                           style: style,
                         ),
                       ),
@@ -165,7 +165,7 @@ class DynamicTableDateTimeInput extends DynamicTableInputType<DateTime> {
                   child: Row(
                     children: [
                       Text(
-                        "Time: ${currentValue != null ? "${currentValue.hour.toString().padLeft(2, '0')}:${currentValue.minute.toString().padLeft(2, '0')}" : "Select time"}",
+                        "${currentValue != null ? "${currentValue.hour.toString().padLeft(2, '0')}:${currentValue.minute.toString().padLeft(2, '0')}" : "Select time"}",
                         style: style,
                       ),
                       const SizedBox(width: 4),
