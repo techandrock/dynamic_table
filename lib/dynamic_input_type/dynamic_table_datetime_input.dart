@@ -42,7 +42,7 @@ class DynamicTableDateTimeInput extends DynamicTableInputType<DateTime> {
     if (formatDateTime != null) return formatDateTime!(dateTime);
     
     // Default format: DD-MM-YYYY HH:MM if showTimePicker is true, otherwise DD-MM-YYYY
-    String dateStr = "${dateTime.day.toString().padLeft(2, '0')}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.year}";
+    String dateStr = "${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}-${dateTime.year}";
     if (timePicker) {
       String timeStr = "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
       return "$dateStr $timeStr";
@@ -109,7 +109,7 @@ class DynamicTableDateTimeInput extends DynamicTableInputType<DateTime> {
                     children: [
                       Expanded(
                         child: Text(
-                          "${currentValue != null ? "${currentValue.day.toString().padLeft(2, '0')}-${currentValue.month.toString().padLeft(2, '0')}-${currentValue.year}" : "Select date"}",
+                          "${currentValue != null ? "${currentValue.month.toString().padLeft(2, '0')}-${currentValue.day.toString().padLeft(2, '0')}-${currentValue.year}" : "Select date"}",
                           style: style,
                         ),
                       ),
