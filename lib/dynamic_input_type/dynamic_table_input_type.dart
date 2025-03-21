@@ -205,6 +205,7 @@ abstract class DynamicTableInputType<T extends Object> {
     bool? enableFeedback,
     AlignmentGeometry alignment = AlignmentDirectional.centerStart,
     BorderRadius? borderRadius,
+    Color? textColor,
   }) {
     return DynamicTableDropDownInput<T>(
       items: items,
@@ -230,6 +231,7 @@ abstract class DynamicTableInputType<T extends Object> {
       enableFeedback: enableFeedback,
       alignment: alignment,
       borderRadius: borderRadius,
+      textColor: textColor,
     );
   }
 

@@ -219,6 +219,7 @@ class _MyAppState extends State<MyApp> {
                 DynamicTableDataColumn(
                   label: const Text("Gender"),
                   dynamicTableInputType: DynamicTableInputType.dropDown<String>(
+                    textColor: Colors.white,
                     items: genderDropdown
                         .map((e) => DropdownMenuItem(
                               value: e,

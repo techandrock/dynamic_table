@@ -28,6 +28,7 @@ class DynamicTableDropDownInput<T extends Object>
     bool? enableFeedback,
     AlignmentGeometry alignment = AlignmentDirectional.centerStart,
     BorderRadius? borderRadius,
+    Color? textColor,
   })  : _displayBuilder = displayBuilder,
         _items = items,
         _selectedItemBuilder = selectedItemBuilder,
@@ -51,6 +52,7 @@ class DynamicTableDropDownInput<T extends Object>
         _enableFeedback = enableFeedback,
         _alignment = alignment,
         _borderRadius = borderRadius,
+        _textColor = textColor,
         super(
         // dynamicTableInput: DynamicTableInput.dropdown,
         );
@@ -68,7 +70,10 @@ class DynamicTableDropDownInput<T extends Object>
       'Either zero or 2 or more [DropdownMenuItem]s were detected '
       'with the same value',
     );
-    return Text((_displayBuilder ?? _defaultDisplayBuilder).call(value));
+    return Text(
+      (_displayBuilder ?? _defaultDisplayBuilder).call(value),
+      style: _style?.copyWith(color: _textColor) ?? TextStyle(color: _textColor),
+    );
   }
 
   final String Function(T?)? _displayBuilder;
@@ -94,6 +99,7 @@ class DynamicTableDropDownInput<T extends Object>
   final bool? _enableFeedback;
   final AlignmentGeometry _alignment;
   final BorderRadius? _borderRadius;
+  final Color? _textColor;
 
   String _defaultDisplayBuilder(T? value) {
     return value.toString();
