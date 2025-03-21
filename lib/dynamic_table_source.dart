@@ -16,6 +16,9 @@ class DynamicTableSource extends DataTableSource {
   final bool Function(int index, List<dynamic> row)? onRowDelete;
   final List<dynamic>? Function(
       int index, List<dynamic> oldValue, List<dynamic> newValue)? onRowSave;
+  final Color? editButtonColor;
+  final Color? saveButtonColor;
+  final Color? deleteButtonColor;
   int _selectedCount = 0;
   Map<int, List<int>> dependentOn = {};
   //{1:[3,4]} 3 and 4th column are dependent on 1st column
@@ -25,14 +28,17 @@ class DynamicTableSource extends DataTableSource {
 
   List<int> _unsavedRows = [];
   DynamicTableSource({
-    this.showActions = false,
+    this.showActions = true,
     this.showDeleteAction = true,
     required this.data,
     required this.columns,
-    required this.actionColumnTitle,
+    this.actionColumnTitle = "Actions",
     this.onRowEdit,
     this.onRowDelete,
     this.onRowSave,
+    this.editButtonColor,
+    this.saveButtonColor,
+    this.deleteButtonColor,
   }) {
     _selectedCount = data.where((element) => element.selected).length;
     for (int i = 0; i < columns.length; i++) {
@@ -279,6 +285,7 @@ class DynamicTableSource extends DataTableSource {
               notifyListeners();
             }
           },
+          color: editButtonColor,
         ),
       );
 
@@ -314,6 +321,7 @@ class DynamicTableSource extends DataTableSource {
             _disposeInputAt(row);
             notifyListeners();
           },
+          color: saveButtonColor,
         ),
       );
       actions.add(DynamicTableActionCancel(
@@ -344,6 +352,7 @@ class DynamicTableSource extends DataTableSource {
             _unsavedRows.remove(row);
           }
         },
+        color: deleteButtonColor,
       ));
     }
 

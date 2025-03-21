@@ -30,33 +30,45 @@ abstract class DynamicTableAction {
 }
 
 class DynamicTableActionEdit extends DynamicTableAction {
-  const DynamicTableActionEdit(
-      {super.icon = const Icon(Icons.edit),
+  DynamicTableActionEdit(
+      {Widget? icon,
       super.onPressed,
       super.showAlways,
-      super.showOnlyOnEditing});
+      super.showOnlyOnEditing = false,
+      Color? color})
+      : super(
+            icon: icon ?? Icon(Icons.edit, color: color));
 }
 
 class DynamicTableActionSave extends DynamicTableAction {
-  const DynamicTableActionSave(
-      {super.icon = const Icon(Icons.save),
+  DynamicTableActionSave(
+      {Widget? icon,
       super.onPressed,
       super.showAlways,
-      super.showOnlyOnEditing});
+      super.showOnlyOnEditing = true,
+      Color? color})
+      : super(
+            icon: icon ?? Icon(Icons.save, color: color));
 }
 
 class DynamicTableActionCancel extends DynamicTableAction {
-  const DynamicTableActionCancel(
-      {super.icon = const Icon(Icons.cancel),
+  DynamicTableActionCancel(
+      {Widget? icon,
       super.onPressed,
       super.showAlways,
-      super.showOnlyOnEditing});
+      super.showOnlyOnEditing = true,
+      Color? color})
+      : super(
+            icon: icon ?? Icon(Icons.cancel, color: color));
 }
 
 class DynamicTableActionDelete extends DynamicTableAction {
-  const DynamicTableActionDelete(
-      {super.icon = const Icon(Icons.delete),
+  DynamicTableActionDelete(
+      {Widget? icon,
       super.onPressed,
-      super.showAlways,
-      super.showOnlyOnEditing});
+      super.showAlways = true,
+      super.showOnlyOnEditing = false,
+      Color? color})
+      : super(
+            icon: icon ?? Icon(Icons.delete, color: color));
 }

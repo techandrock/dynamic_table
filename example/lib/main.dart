@@ -33,8 +33,15 @@ class _MyAppState extends State<MyApp> {
           return SizedBox(
             width: MediaQuery.of(context).size.width * 0.8,
             child: DynamicTable(
+              backgroundColor: Colors.green,
               key: tableKey,
               header: const Text("Person Table"),
+              // paginationButtonTextColor: Colors.white,
+              paginationButtonColor: Colors.white,
+              editButtonColor: Colors.black,
+              saveButtonColor: Colors.purple,
+              deleteButtonColor: Colors.red,
+              cancelButtonColor: Colors.grey,
               onRowEdit: (index, row) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -44,6 +51,7 @@ class _MyAppState extends State<MyApp> {
                 myData[index] = row;
                 return true;
               },
+
               onRowDelete: (index, row) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(

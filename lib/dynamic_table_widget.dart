@@ -77,6 +77,14 @@ class DynamicTable extends StatefulWidget {
     this.onRowSave,
     this.showDeleteAction = false,
     this.showAddRowButton = false,
+    this.backgroundColor,
+    this.paginationButtonColor,
+    this.paginationButtonTextColor,
+    this.editButtonColor,
+    this.saveButtonColor,
+    this.deleteButtonColor,
+    this.addButtonColor,
+    this.cancelButtonColor,
   })  : assert(() {
           if ((onRowEdit == null && onRowSave != null) ||
               (onRowEdit != null && onRowSave == null)) {
@@ -338,6 +346,26 @@ class DynamicTable extends StatefulWidget {
   /// If set to true and [showActions] is set to false, the delete action will be displayed but the actions column will not be displayed.
   final bool showDeleteAction;
 
+  /// The background color of the table.
+  ///
+  /// If null, the default background color from the theme will be used.
+  final Color? backgroundColor;
+
+  /// The color of the pagination buttons.
+  final Color? paginationButtonColor;
+
+  /// The color of the pagination button text.
+  final Color? paginationButtonTextColor;
+
+
+
+  /// Add these new parameters
+  final Color? editButtonColor;
+  final Color? saveButtonColor;
+  final Color? deleteButtonColor;
+  final Color? addButtonColor;
+  final Color? cancelButtonColor;
+
   @override
   State<DynamicTable> createState() => DynamicTableState();
 }
@@ -439,6 +467,9 @@ class DynamicTableState extends State<DynamicTable> {
       onRowEdit: widget.onRowEdit,
       onRowDelete: widget.onRowDelete,
       onRowSave: widget.onRowSave,
+      editButtonColor: widget.editButtonColor,
+      saveButtonColor: widget.saveButtonColor,
+      deleteButtonColor: widget.deleteButtonColor,
     );
   }
 
@@ -456,7 +487,59 @@ class DynamicTableState extends State<DynamicTable> {
 
   @override
   Widget build(BuildContext context) {
-    return PaginatedDataTable(
+    final theme = Theme.of(context);
+    final ThemeData? customTheme;
+    
+    if (widget.backgroundColor != null) {
+      customTheme = theme.copyWith(
+        // Card theme for the main container
+        cardTheme: CardTheme(
+          color: widget.backgroundColor,
+          elevation: 0,
+        ),
+        // Data table theme for rows and headers
+        dataTableTheme: DataTableThemeData(
+          dataRowColor: WidgetStateProperty.all(widget.backgroundColor),
+          headingRowColor: WidgetStateProperty.all(widget.backgroundColor),
+        ),
+        // Color scheme for various UI elements
+        colorScheme: theme.colorScheme.copyWith(
+          surface: widget.backgroundColor,
+          onSurface: theme.colorScheme.onSurface, // Text color on surface
+          primary: Colors.blue, // Replace with your desired button color
+        ),
+        // Pagination controls use these theme properties
+        textButtonTheme: TextButtonThemeData(
+          style: ButtonStyle(
+            backgroundColor: WidgetStateProperty.all(widget.backgroundColor),
+            foregroundColor: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.disabled)) {
+                return theme.disabledColor;
+              }
+              return theme.colorScheme.primary;
+            }),
+          ),
+        ),
+        // For dropdown button in rows per page selector
+        dropdownMenuTheme: DropdownMenuThemeData(
+          menuStyle: MenuStyle(
+            backgroundColor: WidgetStateProperty.all(widget.backgroundColor),
+          ),
+        ),
+        // Override the primary color which controls pagination buttons
+        primaryColor: widget.paginationButtonColor ?? theme.primaryColor,
+      
+        
+        // Override icon theme
+        iconTheme: IconThemeData(
+          color: widget.cancelButtonColor ?? theme.primaryColor,
+        ),
+      );
+    } else {
+      customTheme = null;
+    }
+    
+    final tableWidget = PaginatedDataTable(
       header: widget.header,
       actions: [
         if (widget.showAddRowButton)
@@ -466,6 +549,11 @@ class DynamicTableState extends State<DynamicTable> {
             onPressed: () {
               addRow();
             },
+            style: widget.addButtonColor != null 
+              ? ButtonStyle(
+                  backgroundColor: WidgetStateProperty.all(widget.addButtonColor),
+                ) 
+              : null,
           ),
         ...?widget.actions,
       ],
@@ -496,11 +584,23 @@ class DynamicTableState extends State<DynamicTable> {
             }
           : null,
       dragStartBehavior: widget.dragStartBehavior,
-      arrowHeadColor: widget.arrowHeadColor,
+      arrowHeadColor: widget.paginationButtonColor,
       source: _source,
       checkboxHorizontalMargin: widget.checkboxHorizontalMargin,
       controller: widget.controller,
       primary: widget.primary,
     );
+    
+    if (customTheme != null) {
+      return Theme(
+        data: customTheme,
+        child: Container(
+          color: widget.backgroundColor,
+          child: tableWidget,
+        ),
+      );
+    }
+    
+    return tableWidget;
   }
 }
