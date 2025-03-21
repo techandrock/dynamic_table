@@ -189,7 +189,9 @@ class _MyAppState extends State<MyApp> {
                     label:
                         Container(color: Colors.red, child: const Text("Name")),
                     onSort: (columnIndex, ascending) {},
-                    dynamicTableInputType: DynamicTableInputType.text()),
+                    dynamicTableInputType: DynamicTableInputType.text(
+                      textColor: Colors.white,
+                    )),
                 DynamicTableDataColumn(
                     label: const Text("Unique ID"),
                     onSort: (columnIndex, ascending) {},

@@ -83,6 +83,7 @@ abstract class DynamicTableInputType<T extends Object> {
     Iterable<String>? autofillHints,
     AutovalidateMode? autovalidateMode,
     MouseCursor? mouseCursor,
+    Color? textColor,
   }) {
     return DynamicTableTextInput(
       decoration: decoration,
@@ -121,6 +122,7 @@ abstract class DynamicTableInputType<T extends Object> {
       autofillHints: autofillHints,
       autovalidateMode: autovalidateMode,
       mouseCursor: mouseCursor,
+      textColor: textColor,
     );
   }
 

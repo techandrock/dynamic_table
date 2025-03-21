@@ -38,6 +38,7 @@ class DynamicTableTextInput extends DynamicTableInputType<String> {
     Iterable<String>? autofillHints,
     AutovalidateMode? autovalidateMode,
     MouseCursor? mouseCursor,
+    Color? textColor,
   })  : _mouseCursor = mouseCursor,
         _autovalidateMode = autovalidateMode,
         _autofillHints = autofillHints,
@@ -73,6 +74,7 @@ class DynamicTableTextInput extends DynamicTableInputType<String> {
         _textCapitalization = textCapitalization,
         _decoration = decoration,
         _keyboardType = keyboardType,
+        _textColor = textColor,
         super(
         // dynamicTableInput: DynamicTableInput.text,
         );
@@ -115,10 +117,14 @@ class DynamicTableTextInput extends DynamicTableInputType<String> {
   final Iterable<String>? _autofillHints;
   final AutovalidateMode? _autovalidateMode;
   final MouseCursor? _mouseCursor;
+  final Color? _textColor;
 
   @override
   Widget displayWidget(String? value) {
-    return Text(value ?? "");
+    return Text(
+      value ?? DynamicTableInputType.emptyValue,
+      style: _style?.copyWith(color: _textColor) ?? TextStyle(color: _textColor),
+    );
   }
 
   @override
