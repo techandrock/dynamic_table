@@ -190,7 +190,7 @@ class _MyAppState extends State<MyApp> {
                 DynamicTableDataColumn(
                   label: const Text("Birth Date"),
                   onSort: (columnIndex, ascending) {},
-                  dynamicTableInputType: DynamicTableInputType.date(
+                  dynamicTableInputType: DynamicTableInputType.dateTime(
                     context: context,
                     decoration: const InputDecoration(
                         hintText: "Select Birth Date",
@@ -200,6 +200,8 @@ class _MyAppState extends State<MyApp> {
                     lastDate: DateTime.now().add(
                       const Duration(days: 365),
                     ),
+                    timePicker: true,
+                    timePickerEntryMode: TimePickerEntryMode.dial,
                   ),
                 ),
                 DynamicTableDataColumn(

@@ -279,6 +279,8 @@ static DynamicTableDateTimeInput dateTime({
   TextAlignVertical? textAlignVertical,
   bool autofocus = false,
   MouseCursor? mouseCursor,
+  bool timePicker = false,
+  TimePickerEntryMode timePickerEntryMode = TimePickerEntryMode.dial,
 }) {
   return DynamicTableDateTimeInput(
     context: context,
@@ -293,6 +295,8 @@ static DynamicTableDateTimeInput dateTime({
     textAlignVertical: textAlignVertical,
     autofocus: autofocus,
     mouseCursor: mouseCursor,
-  );
-}
+    timePicker: timePicker,
+    timePickerEntryMode: timePickerEntryMode,
+    );
+  }
 }
