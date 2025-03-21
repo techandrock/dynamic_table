@@ -135,7 +135,7 @@ class DynamicTableTextInput extends DynamicTableInputType<String> {
       decoration: _decoration ??
           const InputDecoration(
             border: OutlineInputBorder(),
-            labelText: "Enter a value",
+            //labelText: "Enter a value",
           ),
       keyboardType: _keyboardType,
       textCapitalization: _textCapitalization,
