@@ -190,8 +190,10 @@ class _MyAppState extends State<MyApp> {
                 DynamicTableDataColumn(
                   label: const Text("Birth Date"),
                   onSort: (columnIndex, ascending) {},
+
                   dynamicTableInputType: DynamicTableInputType.dateTime(
                     context: context,
+                    style: const TextStyle(color: Colors.black),
                     decoration: const InputDecoration(
                         hintText: "Select Birth Date",
                         suffixIcon: Icon(Icons.date_range),

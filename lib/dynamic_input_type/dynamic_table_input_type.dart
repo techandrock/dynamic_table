@@ -281,6 +281,7 @@ static DynamicTableDateTimeInput dateTime({
   MouseCursor? mouseCursor,
   bool timePicker = false,
   TimePickerEntryMode timePickerEntryMode = TimePickerEntryMode.dial,
+  Color iconColor = Colors.black,
 }) {
   return DynamicTableDateTimeInput(
     context: context,
@@ -297,6 +298,7 @@ static DynamicTableDateTimeInput dateTime({
     mouseCursor: mouseCursor,
     timePicker: timePicker,
     timePickerEntryMode: timePickerEntryMode,
+    iconColor: iconColor,
     );
   }
 }

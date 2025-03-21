@@ -15,6 +15,7 @@ class DynamicTableDateTimeInput extends DynamicTableInputType<DateTime> {
   final MouseCursor? mouseCursor;
   final bool timePicker;
   final TimePickerEntryMode timePickerEntryMode;
+  final Color iconColor;
 
   DynamicTableDateTimeInput({
     required this.context,
@@ -35,6 +36,7 @@ class DynamicTableDateTimeInput extends DynamicTableInputType<DateTime> {
     this.mouseCursor,
     this.timePicker = false,
     this.timePickerEntryMode = TimePickerEntryMode.dial,
+    this.iconColor = Colors.black,
   });
 
   String _formatDateTime(DateTime? dateTime) {
@@ -114,7 +116,7 @@ class DynamicTableDateTimeInput extends DynamicTableInputType<DateTime> {
                         ),
                       ),
                       const SizedBox(width: 6),
-                      const Icon(Icons.calendar_today),
+                      Icon(Icons.calendar_today, color: iconColor),
                     ],
                   ),
                 ),
@@ -170,7 +172,7 @@ class DynamicTableDateTimeInput extends DynamicTableInputType<DateTime> {
                         style: style,
                       ),
                       const SizedBox(width: 6),
-                      const Icon(Icons.access_time),
+                      Icon(Icons.access_time, color: iconColor),
                     ],
                   ),
                 ),
