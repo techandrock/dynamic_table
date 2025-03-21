@@ -8,6 +8,8 @@ part 'dynamic_table_dropdown_input.dart';
 part 'dynamic_table_actions_input.dart';
 part 'dynamic_table_autocomplete_input.dart';
 part 'dynamic_table_dependent_dropdown.dart';
+part 'dynamic_table_datetime_input.dart';
+
 
 abstract class DynamicTableInputType<T extends Object> {
   /// The value to display when the value is null (currently not usign this).
@@ -262,4 +264,35 @@ abstract class DynamicTableInputType<T extends Object> {
       optionsViewBuilder: optionsViewBuilder,
     );
   }
+
+  // Add this static method to the DynamicTableInputType class
+static DynamicTableDateTimeInput dateTime({
+  required BuildContext context,
+  required DateTime initialDate,
+  required DateTime lastDate,
+  String Function(DateTime)? formatDateTime,
+  InputDecoration? decoration,
+  TextStyle? style,
+  StrutStyle? strutStyle,
+  TextDirection? textDirection,
+  TextAlign textAlign = TextAlign.start,
+  TextAlignVertical? textAlignVertical,
+  bool autofocus = false,
+  MouseCursor? mouseCursor,
+}) {
+  return DynamicTableDateTimeInput(
+    context: context,
+    initialDate: initialDate,
+    lastDate: lastDate,
+    formatDateTime: formatDateTime,
+    decoration: decoration,
+    style: style,
+    strutStyle: strutStyle,
+    textDirection: textDirection,
+    textAlign: textAlign,
+    textAlignVertical: textAlignVertical,
+    autofocus: autofocus,
+    mouseCursor: mouseCursor,
+  );
+}
 }
