@@ -10,7 +10,7 @@ class DynamicTableSource extends DataTableSource {
   final List<DynamicTableDataRow> data;
   final List<DynamicTableDataColumn> columns;
   final bool showActions;
-  final String actionColumnTitle;
+  final Widget? actionColumnTitle;
   final bool showDeleteAction;
   final bool Function(int index, List<dynamic> row)? onRowEdit;
   final bool Function(int index, List<dynamic> row)? onRowDelete;
@@ -32,7 +32,7 @@ class DynamicTableSource extends DataTableSource {
     this.showDeleteAction = true,
     required this.data,
     required this.columns,
-    this.actionColumnTitle = "Actions",
+    this.actionColumnTitle = const Text("Actions"),
     this.onRowEdit,
     this.onRowDelete,
     this.onRowSave,

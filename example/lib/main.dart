@@ -125,7 +125,7 @@ class _MyAppState extends State<MyApp> {
               dataRowMinHeight: 60,
               dataRowMaxHeight: 60,
               columnSpacing: 60,
-              actionColumnTitle: "My Action Title",
+              actionColumnTitle: const Text("Action", style: TextStyle(color: Colors.white),),
               showCheckboxColumn: true,
               onSelectAll: (value) {
                 ScaffoldMessenger.of(context).showSnackBar(

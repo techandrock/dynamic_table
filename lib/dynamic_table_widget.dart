@@ -72,7 +72,7 @@ class DynamicTable extends StatefulWidget {
     this.primary,
     this.onRowEdit,
     required this.rows,
-    this.actionColumnTitle = "Actions",
+    this.actionColumnTitle = const Text("Actions"),
     this.onRowDelete,
     this.onRowSave,
     this.showDeleteAction = false,
@@ -328,7 +328,7 @@ class DynamicTable extends StatefulWidget {
   /// The title of the last column of the table.
   /// This is used to display the actions.
   /// Defaults to "Actions"
-  final String actionColumnTitle;
+  final Widget? actionColumnTitle;
 
   /// Whether to show the add row button.
   /// Defaults to true.
@@ -450,7 +450,7 @@ class DynamicTableState extends State<DynamicTable> {
     if (widget.showActions || widget.showDeleteAction) {
       columnList.add(
         DataColumn(
-          label: Text(widget.actionColumnTitle),
+          label: widget.actionColumnTitle ?? const Text("Actions"),
         ),
       );
     }
@@ -463,7 +463,7 @@ class DynamicTableState extends State<DynamicTable> {
       columns: _columns,
       showActions: widget.showActions,
       showDeleteAction: widget.showDeleteAction,
-      actionColumnTitle: widget.actionColumnTitle,
+      actionColumnTitle: widget.actionColumnTitle!,
       onRowEdit: widget.onRowEdit,
       onRowDelete: widget.onRowDelete,
       onRowSave: widget.onRowSave,
