@@ -84,6 +84,7 @@ class _MyAppState extends State<MyApp> {
                             // Add your logic to add a new row here
                             // For example, you might want to call a method to add a row
                             // addRow();
+                            tableKey.currentState?.addRow(addRowToEnd: true);
                           }
                           Navigator.of(context).pop();
                         },

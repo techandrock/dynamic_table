@@ -94,12 +94,12 @@ class DynamicTableSource extends DataTableSource {
     notifyListeners();
   }
 
-  void addRow() {
+  void addRow({bool addRowToEnd = true}) {
     if (!showActions) {
       throw Exception(
           'Show actions must be true to make row editable either use addRowWithValues or set showActions to true');
     }
-    insertRow(0, List.filled(columns.length, null), isEditing: true);
+    insertRow(addRowToEnd ? data.length : 0, List.filled(columns.length, null), isEditing: true);
   }
 
   void addRowWithValues(List<dynamic> values, {bool isEditing = false}) {
