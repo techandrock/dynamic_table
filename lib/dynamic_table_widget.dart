@@ -85,6 +85,7 @@ class DynamicTable extends StatefulWidget {
     this.deleteButtonColor,
     this.addButtonColor,
     this.cancelButtonColor,
+    this.dividerColor,
   })  : assert(() {
           if ((onRowEdit == null && onRowSave != null) ||
               (onRowEdit != null && onRowSave == null)) {
@@ -358,13 +359,12 @@ class DynamicTable extends StatefulWidget {
   final Color? paginationButtonTextColor;
 
 
-
-  /// Add these new parameters
   final Color? editButtonColor;
   final Color? saveButtonColor;
   final Color? deleteButtonColor;
   final Color? addButtonColor;
   final Color? cancelButtonColor;
+  final Color? dividerColor;
 
   @override
   State<DynamicTable> createState() => DynamicTableState();
@@ -501,6 +501,12 @@ class DynamicTableState extends State<DynamicTable> {
         dataTableTheme: DataTableThemeData(
           dataRowColor: WidgetStateProperty.all(widget.backgroundColor),
           headingRowColor: WidgetStateProperty.all(widget.backgroundColor),
+          dividerThickness: 2.0,
+        ),
+        dividerTheme: DividerThemeData(
+          color: widget.dividerColor ?? theme.dividerColor, // Change to your desired divider color
+          thickness: 2.0,      // Change thickness
+          space: 1.0,          // Space around divider
         ),
         // Color scheme for various UI elements
         colorScheme: theme.colorScheme.copyWith(

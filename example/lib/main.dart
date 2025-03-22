@@ -33,6 +33,7 @@ class _MyAppState extends State<MyApp> {
           return SizedBox(
             width: MediaQuery.of(context).size.width * 0.8,
             child: DynamicTable(
+              dividerColor: Colors.red,
               backgroundColor: Colors.green,
               key: tableKey,
               header: const Text("Person Table"),
