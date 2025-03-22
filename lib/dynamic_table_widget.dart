@@ -558,7 +558,7 @@ class DynamicTableState extends State<DynamicTable> {
       actions: [
         if (widget.showAddRowButton)
           ElevatedButton.icon(
-            icon: const Icon(Icons.add),
+            icon: Icon(Icons.add, color: widget.addButtonTextColor,),
             label: Text(widget.addButtonText ?? "Add Row", style: TextStyle(color: widget.addButtonTextColor),),
             onPressed: () {
               addRow();
