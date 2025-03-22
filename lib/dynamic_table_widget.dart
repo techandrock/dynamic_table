@@ -90,6 +90,7 @@ class DynamicTable extends StatefulWidget {
     this.dividerSpace,
     this.addButtonText,
     this.addButtonTextColor,
+    this.onAddRowButtonPress,
   })  : assert(() {
           if ((onRowEdit == null && onRowSave != null) ||
               (onRowEdit != null && onRowSave == null)) {
@@ -374,6 +375,8 @@ class DynamicTable extends StatefulWidget {
   final String? addButtonText;
   final Color? addButtonTextColor;
 
+  final VoidCallback? onAddRowButtonPress;
+
   @override
   State<DynamicTable> createState() => DynamicTableState();
 }
@@ -561,7 +564,7 @@ class DynamicTableState extends State<DynamicTable> {
             icon: Icon(Icons.add, color: widget.addButtonTextColor,),
             label: Text(widget.addButtonText ?? "Add Row", style: TextStyle(color: widget.addButtonTextColor),),
             onPressed: () {
-              addRow();
+              widget.onAddRowButtonPress != null ? widget.onAddRowButtonPress?.call() : addRow();
             },
             style: widget.addButtonColor != null 
               ? ButtonStyle(

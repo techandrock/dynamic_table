@@ -45,6 +45,55 @@ class _MyAppState extends State<MyApp> {
               saveButtonColor: Colors.purple,
               deleteButtonColor: Colors.red,
               cancelButtonColor: Colors.grey,
+              onAddRowButtonPress: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  int numberOfRows = 1; // Default value
+                  return AlertDialog(
+                    title: const Text("Add Rows"),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text("Select the number of rows to add:"),
+                        Slider(
+                          value: numberOfRows.toDouble(),
+                          min: 1,
+                          max: 10,
+                          divisions: 9,
+                          label: numberOfRows.toString(),
+                          onChanged: (double value) {
+                            setState(() {
+                              numberOfRows = value.toInt();
+                            });
+                          },
+                        ),
+                        Text("Number of rows: $numberOfRows"),
+                      ],
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text("Cancel"),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          for (int i = 0; i < numberOfRows; i++) {
+                            // Add your logic to add a new row here
+                            // For example, you might want to call a method to add a row
+                            // addRow();
+                          }
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text("Add"),
+                      ),
+                    ],
+                  );
+                },
+              );
+              },
               onRowEdit: (index, row) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
