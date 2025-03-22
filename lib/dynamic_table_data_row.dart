@@ -96,6 +96,14 @@ class DynamicTableDataRow {
   /// * [DataCell], which is the cell of a [DataTable] widget.
   bool isEditing;
 
+  /// Whether the row is selectable.
+  ///
+  /// If true and [onSelectChanged] is provided, the row can be selected.
+  /// If false, the row cannot be selected even if [onSelectChanged] is provided.
+  ///
+  /// Defaults to true.
+  final bool isSelectable;
+
   /// Creates the configuration for a row of a [DataTable].
   ///
   /// The [cells] argument must not be null.
@@ -106,6 +114,7 @@ class DynamicTableDataRow {
     this.onLongPress,
     this.color,
     this.isEditing = false,
+    this.isSelectable = true,
     required this.cells,
   });
 }

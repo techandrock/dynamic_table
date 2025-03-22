@@ -166,6 +166,7 @@ class _MyAppState extends State<MyApp> {
               rows: List.generate(
                 myData.length,
                 (index) => DynamicTableDataRow(
+                  isSelectable: false,
                   onSelectChanged: (value) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(

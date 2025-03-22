@@ -219,6 +219,12 @@ class DynamicTableSource extends DataTableSource {
     if (index < 0 || index > data.length) {
       throw Exception('Index out of bounds');
     }
+    
+    // Only allow selection if the row is selectable
+    if (!data[index].isSelectable) {
+      return;
+    }
+    
     if (data[index].selected != isSelected) {
       _selectedCount += isSelected ? 1 : -1;
       assert(_selectedCount >= 0, 'Selected count cannot be less than 0');
@@ -228,9 +234,17 @@ class DynamicTableSource extends DataTableSource {
   }
 
   void selectAllRows({required bool isSelected}) {
-    for (int i = 0; i < data.length; i++) {
-      selectRow(i, isSelected: isSelected);
+    _selectedCount = 0;
+    for (var i = 0; i < data.length; i++) {
+      // Only select rows that are selectable
+      if (data[i].isSelectable) {
+        data[i].selected = isSelected;
+        if (isSelected) {
+          _selectedCount++;
+        }
+      }
     }
+    notifyListeners();
   }
 
   @override
@@ -251,10 +265,10 @@ class DynamicTableSource extends DataTableSource {
     var datarow = DataRow.byIndex(
       index: index,
       selected: data[index].selected,
-      onSelectChanged: (value) {
+      onSelectChanged: data[index].isSelectable ? (value) {
         selectRow(index, isSelected: value ?? false);
         data[index].onSelectChanged?.call(value);
-      },
+      } : null,
       onLongPress: data[index].onLongPress,
       color: data[index].color,
       cells: _buildRowCells(data[index].cells, index),
