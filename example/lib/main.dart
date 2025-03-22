@@ -34,6 +34,8 @@ class _MyAppState extends State<MyApp> {
             width: MediaQuery.of(context).size.width * 0.8,
             child: DynamicTable(
               dividerColor: Colors.red,
+              dividerSpace: 10,
+              dividerThickness: 0.5,
               backgroundColor: Colors.green,
               key: tableKey,
               header: const Text("Person Table"),
