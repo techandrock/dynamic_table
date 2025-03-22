@@ -554,7 +554,7 @@ class DynamicTableState extends State<DynamicTable> {
     }
     
     final tableWidget = PaginatedDataTable(
-      header: widget.header,
+      header: Center(child: widget.header),
       actions: [
         if (widget.showAddRowButton)
           ElevatedButton.icon(
