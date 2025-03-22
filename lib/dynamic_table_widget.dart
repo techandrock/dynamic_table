@@ -88,6 +88,7 @@ class DynamicTable extends StatefulWidget {
     this.dividerColor,
     this.dividerThickness,
     this.dividerSpace,
+    this.addButtonText,
   })  : assert(() {
           if ((onRowEdit == null && onRowSave != null) ||
               (onRowEdit != null && onRowSave == null)) {
@@ -369,6 +370,7 @@ class DynamicTable extends StatefulWidget {
   final Color? dividerColor;
   final double? dividerThickness;
   final double? dividerSpace;
+  final String? addButtonText;
 
   @override
   State<DynamicTable> createState() => DynamicTableState();
@@ -555,7 +557,7 @@ class DynamicTableState extends State<DynamicTable> {
         if (widget.showAddRowButton)
           ElevatedButton.icon(
             icon: const Icon(Icons.add),
-            label: const Text("Add Row"),
+            label: Text(widget.addButtonText ?? "Add Row"),
             onPressed: () {
               addRow();
             },
