@@ -187,10 +187,10 @@ class _MyAppState extends State<MyApp> {
               ),
               columns: [
                 DynamicTableDataColumn(
-                    label:
-                        Container(color: Colors.red, child: const Text("Name")),
+                    label: const Text("Name"),
                     onSort: (columnIndex, ascending) {},
                     dynamicTableInputType: DynamicTableInputType.text(
+                      focusedBorderColor: Colors.red,
                       textColor: Colors.white,
                     )),
                 DynamicTableDataColumn(
@@ -204,6 +204,7 @@ class _MyAppState extends State<MyApp> {
 
                   dynamicTableInputType: DynamicTableInputType.dateTime(
                     context: context,
+                    focusedBorderColor: Colors.red,
                     style: const TextStyle(color: Colors.black),
                     decoration: const InputDecoration(
                         hintText: "Select Birth Date",
@@ -220,6 +221,7 @@ class _MyAppState extends State<MyApp> {
                 DynamicTableDataColumn(
                   label: const Text("Gender"),
                   dynamicTableInputType: DynamicTableInputType.dropDown<String>(
+                    focusedBorderColor: Colors.red,
                     textColor: Colors.white,
                     items: genderDropdown
                         .map((e) => DropdownMenuItem(

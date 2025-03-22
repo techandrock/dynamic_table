@@ -29,6 +29,7 @@ class DynamicTableDropDownInput<T extends Object>
     AlignmentGeometry alignment = AlignmentDirectional.centerStart,
     BorderRadius? borderRadius,
     Color? textColor,
+    Color? focusedBorderColor,
   })  : _displayBuilder = displayBuilder,
         _items = items,
         _selectedItemBuilder = selectedItemBuilder,
@@ -53,6 +54,7 @@ class DynamicTableDropDownInput<T extends Object>
         _alignment = alignment,
         _borderRadius = borderRadius,
         _textColor = textColor,
+        _focusedBorderColor = focusedBorderColor,
         super(
         // dynamicTableInput: DynamicTableInput.dropdown,
         );
@@ -100,6 +102,7 @@ class DynamicTableDropDownInput<T extends Object>
   final AlignmentGeometry _alignment;
   final BorderRadius? _borderRadius;
   final Color? _textColor;
+  final Color? _focusedBorderColor;
 
   String _defaultDisplayBuilder(T? value) {
     return value.toString();
@@ -143,7 +146,19 @@ class DynamicTableDropDownInput<T extends Object>
       focusNode: _focusNode,
       autofocus: _autofocus,
       dropdownColor: _dropdownColor,
-      decoration: _decoration,
+      decoration: _decoration?.copyWith(
+        focusedBorder: _focusedBorderColor != null
+            ? OutlineInputBorder(
+                borderSide: BorderSide(color: _focusedBorderColor!),
+              )
+            : _decoration?.focusedBorder,
+      ) ?? (_focusedBorderColor != null
+          ? InputDecoration(
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: _focusedBorderColor!),
+              ),
+            )
+          : null),
       menuMaxHeight: _menuMaxHeight,
       enableFeedback: _enableFeedback,
       alignment: _alignment,

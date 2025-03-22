@@ -16,6 +16,7 @@ class DynamicTableDateTimeInput extends DynamicTableInputType<DateTime> {
   final bool timePicker;
   final TimePickerEntryMode timePickerEntryMode;
   final Color iconColor;
+  final Color? focusedBorderColor;
 
   DynamicTableDateTimeInput({
     required this.context,
@@ -37,6 +38,7 @@ class DynamicTableDateTimeInput extends DynamicTableInputType<DateTime> {
     this.timePicker = false,
     this.timePickerEntryMode = TimePickerEntryMode.dial,
     this.iconColor = Colors.black,
+    this.focusedBorderColor,
   });
 
   String _formatDateTime(DateTime? dateTime) {

@@ -39,6 +39,7 @@ class DynamicTableTextInput extends DynamicTableInputType<String> {
     AutovalidateMode? autovalidateMode,
     MouseCursor? mouseCursor,
     Color? textColor,
+    Color? focusedBorderColor,
   })  : _mouseCursor = mouseCursor,
         _autovalidateMode = autovalidateMode,
         _autofillHints = autofillHints,
@@ -75,6 +76,7 @@ class DynamicTableTextInput extends DynamicTableInputType<String> {
         _decoration = decoration,
         _keyboardType = keyboardType,
         _textColor = textColor,
+        _focusedBorderColor = focusedBorderColor,
         super(
         // dynamicTableInput: DynamicTableInput.text,
         );
@@ -118,7 +120,7 @@ class DynamicTableTextInput extends DynamicTableInputType<String> {
   final AutovalidateMode? _autovalidateMode;
   final MouseCursor? _mouseCursor;
   final Color? _textColor;
-
+  final Color? _focusedBorderColor;
   @override
   Widget displayWidget(String? value) {
     return Text(
@@ -139,8 +141,11 @@ class DynamicTableTextInput extends DynamicTableInputType<String> {
       },
       controller: TextEditingController(text: value),
       decoration: _decoration ??
-          const InputDecoration(
+           InputDecoration(
             border: OutlineInputBorder(),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: _focusedBorderColor ?? Colors.black),
+            ),
             //labelText: "Enter a value",
           ),
       keyboardType: _keyboardType,

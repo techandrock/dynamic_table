@@ -84,6 +84,7 @@ abstract class DynamicTableInputType<T extends Object> {
     AutovalidateMode? autovalidateMode,
     MouseCursor? mouseCursor,
     Color? textColor,
+    Color? focusedBorderColor,
   }) {
     return DynamicTableTextInput(
       decoration: decoration,
@@ -123,6 +124,7 @@ abstract class DynamicTableInputType<T extends Object> {
       autovalidateMode: autovalidateMode,
       mouseCursor: mouseCursor,
       textColor: textColor,
+      focusedBorderColor: focusedBorderColor,
     );
   }
 
@@ -155,6 +157,7 @@ abstract class DynamicTableInputType<T extends Object> {
     List<TextInputFormatter>? inputFormatters,
     bool? enabled,
     MouseCursor? mouseCursor,
+    Color? focusedBorderColor,
   }) {
     return DynamicTableDateInput(
       context: context,
@@ -169,6 +172,7 @@ abstract class DynamicTableInputType<T extends Object> {
       textAlignVertical: textAlignVertical,
       autofocus: autofocus,
       mouseCursor: mouseCursor,
+      focusedBorderColor: focusedBorderColor,
     );
   }
 
@@ -206,6 +210,7 @@ abstract class DynamicTableInputType<T extends Object> {
     AlignmentGeometry alignment = AlignmentDirectional.centerStart,
     BorderRadius? borderRadius,
     Color? textColor,
+    Color? focusedBorderColor,
   }) {
     return DynamicTableDropDownInput<T>(
       items: items,
@@ -232,6 +237,7 @@ abstract class DynamicTableInputType<T extends Object> {
       alignment: alignment,
       borderRadius: borderRadius,
       textColor: textColor,
+      focusedBorderColor: focusedBorderColor,
     );
   }
 
@@ -286,6 +292,7 @@ static DynamicTableDateTimeInput dateTime({
   bool timePicker = false,
   TimePickerEntryMode timePickerEntryMode = TimePickerEntryMode.dial,
   Color iconColor = Colors.black,
+  Color? focusedBorderColor,
 }) {
   return DynamicTableDateTimeInput(
     context: context,
@@ -303,6 +310,7 @@ static DynamicTableDateTimeInput dateTime({
     timePicker: timePicker,
     timePickerEntryMode: timePickerEntryMode,
     iconColor: iconColor,
+    focusedBorderColor: focusedBorderColor,
     );
   }
 }

@@ -14,6 +14,7 @@ class DynamicTableDateInput extends DynamicTableInputType<DateTime> {
     TextAlignVertical? textAlignVertical,
     bool autofocus = false,
     MouseCursor? mouseCursor,
+    this.focusedBorderColor,
   })  : _textDirection = textDirection,
         _style = style,
         _decoration = decoration,
@@ -39,6 +40,7 @@ class DynamicTableDateInput extends DynamicTableInputType<DateTime> {
   final TextAlignVertical? _textAlignVertical;
   final bool _autofocus;
   final MouseCursor? _mouseCursor;
+  final Color? focusedBorderColor;
 
   String Function(DateTime)? formatDate = (DateTime date) {
     return "${date.day}/${date.month}/${date.year}";
