@@ -82,8 +82,26 @@ class DynamicTableDateTimeInput extends DynamicTableInputType<DateTime> {
                   final DateTime? pickedDate = await showDatePicker(
                     context: context,
                     initialDate: currentValue ?? initialDate,
-                    firstDate: DateTime(1900),
+                    firstDate: DateTime(1990),
                     lastDate: lastDate,
+                    builder: (BuildContext context, Widget? child) {
+                      return Theme(
+                        data: Theme.of(context).copyWith(
+                          colorScheme: Theme.of(context).colorScheme.copyWith(
+                            primary: focusedBorderColor ?? Theme.of(context).primaryColor, // Color for header, selected day
+                            onPrimary: Colors.white, // Color for text on primary color
+                            onSurface: iconColor, // Color for day numbers on calendar
+                          ),
+                          textButtonTheme: TextButtonThemeData(
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.white, // Button text color
+                              backgroundColor: focusedBorderColor ?? Theme.of(context).primaryColor,
+                            ),
+                          ),
+                        ),
+                        child: child!,
+                      );
+                    },
                   );
                   
                   if (pickedDate != null) {
@@ -143,6 +161,23 @@ class DynamicTableDateTimeInput extends DynamicTableInputType<DateTime> {
                     context: context,
                     initialTime: TimeOfDay(hour: currentValue.hour, minute: currentValue.minute),
                     initialEntryMode: timePickerEntryMode,
+                    builder: (BuildContext context, Widget? child) {
+                      return Theme(
+                        data: Theme.of(context).copyWith(
+                          colorScheme: Theme.of(context).colorScheme.copyWith(
+                            primary: focusedBorderColor ?? Theme.of(context).primaryColor, // Color for header, selected time
+                            onPrimary: Colors.white, // Color for text on primary color
+                            onSurface: iconColor, // Color for dial numbers
+                          ),
+                          textButtonTheme: TextButtonThemeData(
+                            style: TextButton.styleFrom(
+                              foregroundColor: focusedBorderColor ?? Theme.of(context).primaryColor, // Button text color
+                            ),
+                          ),
+                        ),
+                        child: child!,
+                      );
+                    },
                   );
                   
                   if (pickedTime != null) {

@@ -207,7 +207,7 @@ class _MyAppState extends State<MyApp> {
 
                   dynamicTableInputType: DynamicTableInputType.dateTime(
                     context: context,
-                    focusedBorderColor: Colors.red,
+                    focusedBorderColor: Colors.green,
                     style: const TextStyle(color: Colors.black),
                     decoration: const InputDecoration(
                         hintText: "Select Birth Date",
@@ -224,7 +224,7 @@ class _MyAppState extends State<MyApp> {
                 DynamicTableDataColumn(
                   label: const Text("Gender"),
                   dynamicTableInputType: DynamicTableInputType.dropDown<String>(
-                    focusedBorderColor: Colors.red,
+                    focusedBorderColor: Colors.green,
                     textColor: Colors.white,
                     items: genderDropdown
                         .map((e) => DropdownMenuItem(
