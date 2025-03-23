@@ -91,6 +91,7 @@ class DynamicTable extends StatefulWidget {
     this.addButtonText,
     this.addButtonTextColor,
     this.onAddRowButtonPress,
+    this.showOnlyNonEmptyRows = false,
   })  : assert(() {
           if ((onRowEdit == null && onRowSave != null) ||
               (onRowEdit != null && onRowSave == null)) {
@@ -377,21 +378,95 @@ class DynamicTable extends StatefulWidget {
 
   final VoidCallback? onAddRowButtonPress;
 
+
+  final bool showOnlyNonEmptyRows;
+
   @override
   State<DynamicTable> createState() => DynamicTableState();
 }
 
 class DynamicTableState extends State<DynamicTable> {
+  // Add a ScrollController if not already using widget.controller
+  late ScrollController _scrollController;
+  
+  @override
+  void initState() {
+    _buildColumns();
+    _buildSource();
+    _rowsPerPage = widget.rowsPerPage;
+    // Initialize the scroll controller
+    _scrollController = widget.controller ?? ScrollController();
+    super.initState();
+  }
+  
+  @override
+  void dispose() {
+    // Only dispose if we created it (not if it was passed in via widget.controller)
+    if (widget.controller == null) {
+      _scrollController.dispose();
+    }
+    super.dispose();
+  }
+
   void insertRow(int index, List<dynamic> values, {bool isEditing = false}) {
     _source.insertRow(index, values, isEditing: isEditing);
+    // Scroll to the inserted row after the UI updates
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToBottomOfParent();
+    });
   }
 
   void addRow({bool addRowToEnd = true}) {
     _source.addRow(addRowToEnd: addRowToEnd);
+    // Scroll to the new row after the UI updates
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToBottomOfParent();
+    });
   }
 
   void addRowWithValues(List<dynamic> values, {bool isEditing = false, bool addRowToEnd = true, bool isSelectable = false}) {
     _source.addRowWithValues(values, isEditing: isEditing, addRowToEnd: addRowToEnd, isSelectable: isSelectable);
+    
+    // Update the internal state first
+    setState(() {
+      _rowsPerPage = 10;
+    });
+    
+    // Then notify the parent if needed
+    widget.onRowsPerPageChanged?.call(10);
+  }
+  
+  // Helper method to scroll to the bottom of the parent SingleChildScrollView
+  void _scrollToBottomOfParent() {
+    // Find the parent SingleChildScrollView
+    final scrollableState = Scrollable.maybeOf(context);
+    if (scrollableState != null) {
+      // Scroll to the bottom
+      scrollableState.position.animateTo(
+        scrollableState.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
+  }
+
+  // Add this method to scroll to a specific row in the parent ScrollView
+  void scrollToRow(int rowIndex) {
+    // Calculate approximate position based on row height
+    final rowHeight = widget.dataRowMaxHeight;
+    final headerHeight = widget.headingRowHeight;
+    final approximatePosition = headerHeight + (rowIndex * rowHeight);
+    
+    // Find the parent SingleChildScrollView
+    final scrollableState = Scrollable.maybeOf(context);
+    if (scrollableState != null) {
+      // Scroll to the calculated position
+      scrollableState.position.animateTo(
+        approximatePosition.clamp(0.0, scrollableState.position.maxScrollExtent),
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
   }
 
   void deleteRow(int index) {
@@ -432,14 +507,6 @@ class DynamicTableState extends State<DynamicTable> {
 
   void selectAllRows({required bool isSelected}) {
     _source.selectAllRows(isSelected: isSelected);
-  }
-
-  @override
-  void initState() {
-    _buildColumns();
-    _buildSource();
-    _rowsPerPage = widget.rowsPerPage;
-    super.initState();
   }
 
   late DynamicTableSource _source;
@@ -556,6 +623,26 @@ class DynamicTableState extends State<DynamicTable> {
       customTheme = null;
     }
     
+    // Calculate effective rowsPerPage
+    int effectiveRowsPerPage = _rowsPerPage;
+    if (widget.showOnlyNonEmptyRows) {
+      // Count how many rows actually have data
+      int dataRowCount = _source.data.where((row) {
+        return row.cells.any((cell) => cell.value != null && cell.value.toString().isNotEmpty);
+      }).length;
+      
+      // Check if any row is in editing mode (being added)
+      bool hasEditingRow = _source.data.any((row) => row.isEditing);
+      
+      // If a row is being added/edited, include it in the count
+      if (hasEditingRow) {
+        dataRowCount += 1;
+      }
+      
+      // Use the count of data rows or minimum of 1 if no data rows
+      effectiveRowsPerPage = dataRowCount > 0 ? dataRowCount : 1;
+    }
+    
     final tableWidget = PaginatedDataTable(
       header: Center(child: widget.header),
       actions: [
@@ -590,7 +677,7 @@ class DynamicTableState extends State<DynamicTable> {
       showFirstLastButtons: widget.showFirstLastButtons,
       initialFirstRowIndex: widget.initialFirstRowIndex,
       onPageChanged: widget.onPageChanged,
-      rowsPerPage: _rowsPerPage,
+      rowsPerPage: effectiveRowsPerPage,
       availableRowsPerPage: widget.availableRowsPerPage,
       onRowsPerPageChanged: widget.onRowsPerPageChanged != null
           ? (value) {
@@ -604,7 +691,7 @@ class DynamicTableState extends State<DynamicTable> {
       arrowHeadColor: widget.paginationButtonColor,
       source: _source,
       checkboxHorizontalMargin: widget.checkboxHorizontalMargin,
-      controller: widget.controller,
+      controller: _scrollController, // Use our controller instead of widget.controller
       primary: widget.primary,
     );
     

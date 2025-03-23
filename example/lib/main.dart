@@ -21,6 +21,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final tableKey = GlobalKey<DynamicTableState>();
   final _tableKey = GlobalKey<DynamicTableState>();
+  final _scrollController = ScrollController();
   var myData = dummyData.toList();
 
     List<Map<String, dynamic>> yourListOfMaps = [
@@ -326,99 +327,116 @@ class _MyAppState extends State<MyApp> {
               ),
 
               SizedBox(
-                child: DynamicTable(
-                  key: _tableKey,
-                  showAddRowButton: true,
-                  addButtonText: "Add Route",
-                  addButtonColor: Colors.blue,
-                  addButtonTextColor: Colors.white,
-                  actionColumnTitle: const Text("Actions", style: TextStyle(color: Colors.white)),
-                  showActions: true,
-                  showCheckboxColumn: false,
-                  dividerColor: Colors.blue,
-                  dividerThickness: 0.5,
-                  backgroundColor: Colors.grey,
-                  editButtonColor: Colors.blue,
-                  deleteButtonColor: Colors.blue,
-                  columnSpacing: 56.0,
-                  horizontalMargin: 10.0,
-                  actions: const [],
-                  
-                  onAddRowButtonPress: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        TextEditingController rowController = TextEditingController(text: '1');
-                        return AlertDialog(
-                          title: const Text("Add Rows"),
-                          content: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Text("Enter the number of rows to add:"),
-                              TextField(
-                                controller: rowController,
-                                keyboardType: TextInputType.number,
-                                decoration: const InputDecoration(
-                                  hintText: "Number of rows",
-                                  border: OutlineInputBorder(),
+                width: double.infinity,
+                height: 200,
+                child: SingleChildScrollView(
+                  controller: _scrollController,
+                  child: DynamicTable(
+                    key: _tableKey,
+                    showOnlyNonEmptyRows: true,
+                    showAddRowButton: true,
+                    addButtonText: "Add Route",
+                    addButtonColor: Colors.blue,
+                    addButtonTextColor: Colors.white,
+                    actionColumnTitle: const Text("Actions", style: TextStyle(color: Colors.white)),
+                    showActions: true,
+                    showCheckboxColumn: false,
+                    dividerColor: Colors.blue,
+                    dividerThickness: 0.5,
+                    backgroundColor: Colors.grey,
+                    editButtonColor: Colors.blue,
+                    deleteButtonColor: Colors.blue,
+                    columnSpacing: 56.0,
+                    horizontalMargin: 10.0,
+                    actions: const [],
+                    
+                    onAddRowButtonPress: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          TextEditingController rowController = TextEditingController(text: '1');
+                          return AlertDialog(
+                            title: const Text("Add Rows"),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Text("Enter the number of rows to add:"),
+                                TextField(
+                                  controller: rowController,
+                                  keyboardType: TextInputType.number,
+                                  decoration: const InputDecoration(
+                                    hintText: "Number of rows",
+                                    border: OutlineInputBorder(),
+                                  ),
                                 ),
+                              ],
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text("Cancel"),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  int numberOfRows = int.tryParse(rowController.text) ?? 1;
+                                  numberOfRows = numberOfRows.clamp(1, 150);
+                                  
+                                  // Get the current row count before adding new rows
+                                  final lastRowIndex = yourListOfMaps.length - 1;
+                                  
+                                  // Add the new rows
+                                  for (int i = 0; i < numberOfRows; i++) {
+                                    yourListOfMaps.add({'route': '${yourListOfMaps.length + 1}', 'score': ""});
+                                    _tableKey.currentState?.addRowWithValues(yourListOfMaps.last.values.toList(), isEditing: true, addRowToEnd: true);
+                                  }
+                                  
+                                  // Scroll to the last row that existed before adding new rows
+                                  if (lastRowIndex >= 0) {
+                                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                                      _tableKey.currentState?.scrollToRow(lastRowIndex);
+                                    });
+                                  }
+                                  
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text("Add"),
                               ),
                             ],
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text("Cancel"),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                int numberOfRows = int.tryParse(rowController.text) ?? 1;
-                                // Limit to a reasonable number if needed
-                                numberOfRows = numberOfRows.clamp(1, 50);
-                                
-                                for (int i = 0; i < numberOfRows; i++) {
-                                  yourListOfMaps.add({'route': '${yourListOfMaps.length + 1}', 'score': ""});
-                                  _tableKey.currentState?.addRowWithValues(yourListOfMaps.last.values.toList(), isEditing: true, addRowToEnd: true);
-                                }
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text("Add"),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  },
-                
-                  header: const Text('Routes', style: TextStyle(color: Colors.white)),
-                  columns: [
-                    DynamicTableDataColumn(
-                      isEditable: false,
-                      label: const Text('Route', style: TextStyle(color: Colors.white)), 
-                      dynamicTableInputType: DynamicTableInputType.text(
-                      focusedBorderColor: Colors.blue,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                      ),
-                    )),
-                    DynamicTableDataColumn(label: const Text('Score', style: TextStyle(color: Colors.white)), dynamicTableInputType: DynamicTableInputType.text(
-                      focusedBorderColor: Colors.blue,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                      ),
-                    )),
-                  ],
-                  rows: yourListOfMaps.map((entry) => DynamicTableDataRow(
-                    index: yourListOfMaps.indexOf(entry),
-                    cells: [
-                      DynamicTableDataCell(value: entry['route'] ?? ''),
-                      DynamicTableDataCell(value: entry['score']?.toString() ?? ''),
+                          );
+                        },
+                      );
+                    },
+                  
+                    header: const Text('Routes', style: TextStyle(color: Colors.white)),
+                    columns: [
+                      DynamicTableDataColumn(
+                        isEditable: false,
+                        label: const Text('Route', style: TextStyle(color: Colors.white)), 
+                        dynamicTableInputType: DynamicTableInputType.text(
+                        focusedBorderColor: Colors.blue,
+                        style: const TextStyle(color: Colors.white),
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                        ),
+                      )),
+                      DynamicTableDataColumn(label: const Text('Score', style: TextStyle(color: Colors.white)), dynamicTableInputType: DynamicTableInputType.text(
+                        focusedBorderColor: Colors.blue,
+                        style: const TextStyle(color: Colors.white),
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                        ),
+                      )),
                     ],
-                  )).toList(),
+                    rows: yourListOfMaps.map((entry) => DynamicTableDataRow(
+                      index: yourListOfMaps.indexOf(entry),
+                      cells: [
+                        DynamicTableDataCell(value: entry['route'] ?? ''),
+                        DynamicTableDataCell(value: entry['score']?.toString() ?? ''),
+                      ],
+                    )).toList(),
+                  ),
                 ),
               ),
             ],
@@ -427,5 +445,11 @@ class _MyAppState extends State<MyApp> {
       ),
       debugShowCheckedModeBanner: false,
     );
+  }
+  
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 }

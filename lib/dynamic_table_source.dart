@@ -7,7 +7,7 @@ import 'package:dynamic_table/dynamic_table_data_column.dart';
 import 'package:dynamic_table/dynamic_table_data_row.dart';
 
 class DynamicTableSource extends DataTableSource {
-  final List<DynamicTableDataRow> data;
+  late final List<DynamicTableDataRow> data;
   final List<DynamicTableDataColumn> columns;
   final bool showActions;
   final Widget? actionColumnTitle;
@@ -30,7 +30,7 @@ class DynamicTableSource extends DataTableSource {
   DynamicTableSource({
     this.showActions = true,
     this.showDeleteAction = true,
-    required this.data,
+    required List<DynamicTableDataRow> data,
     required this.columns,
     this.actionColumnTitle = const Text("Actions"),
     this.onRowEdit,
@@ -39,8 +39,17 @@ class DynamicTableSource extends DataTableSource {
     this.editButtonColor,
     this.saveButtonColor,
     this.deleteButtonColor,
+    bool filterEmptyRows = true,
   }) {
-    _selectedCount = data.where((element) => element.selected).length;
+    // Filter out empty rows if requested
+    if (filterEmptyRows) {
+      this.data = data.where((row) => 
+        row.cells.any((cell) => cell.value != null)).toList();
+    } else {
+      this.data = data;
+    }
+    
+    _selectedCount = this.data.where((element) => element.selected).length;
     for (int i = 0; i < columns.length; i++) {
       if (columns[i].dynamicTableInputType.dependentOn != null) {
         int dependent = (columns[i].dynamicTableInputType
@@ -87,11 +96,15 @@ class DynamicTableSource extends DataTableSource {
             );
           }).toList(),
         ));
+
     _editingValues[index] = values;
+
     _shiftValues(index, 1);
+
     if (isEditing) {
       _unsavedRows.add(index);
     }
+    
     notifyListeners();
   }
 
