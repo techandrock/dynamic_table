@@ -438,14 +438,13 @@ class DynamicTableState extends State<DynamicTable> {
       if (addRowToEnd) {
         _source.data.add(newRow);
         // Schedule scrolling after the frame is rendered
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          print("Scrolling to bottom");
-          _scrollController.animateTo(
-            _scrollController.position.maxScrollExtent,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeOut,
-          );
-        });
+        // WidgetsBinding.instance.addPostFrameCallback((_) {
+        //   _scrollController.animateTo(
+        //     _scrollController.position.maxScrollExtent,
+        //     duration: const Duration(milliseconds: 300),
+        //     curve: Curves.easeOut,
+        //   );
+        // });
       } else {
         _source.data.insert(0, newRow);
       }
@@ -785,37 +784,30 @@ class DynamicTableState extends State<DynamicTable> {
         bool isColumnEditable = j < _columns.length && _columns[j].isEditable;
         
         if (_source.data[i].isEditing && isColumnEditable) {
-          // Create editable cell for editable columns
+          // Get the current value
           final currentValue = _source.getEditedRowValues(i)[j];
-          final textController = TextEditingController(
-            text: currentValue != null ? currentValue.toString() : '',
-          );
           
+          // Use the column's dynamicTableInputType to create the appropriate editing widget
           cells.add(
             DataCell(
-              TextField(
-                controller: textController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                ),
-                onChanged: (value) {
+              _columns[j].dynamicTableInputType.editingWidget(
+                currentValue, 
+                (newValue, row, column) {
                   // Update the editing value
-                  _source.updateEditingValue(i, j, value);
+                  _source.updateEditingValue(i, j, newValue);
                 },
+                i,  // row index
+                j   // column index
               ),
               showEditIcon: false,
             ),
           );
         } else {
-          // Create regular cell for non-editable columns or when not in edit mode
+          // For display mode, also use the column's dynamicTableInputType
+          final value = _source.data[i].cells[j].value;
           cells.add(
             DataCell(
-              Text(
-                _source.data[i].cells[j].value != null 
-                    ? _source.data[i].cells[j].value.toString() 
-                    : '',
-              ),
+              _columns[j].dynamicTableInputType.displayWidget(value),
             ),
           );
         }
@@ -901,7 +893,7 @@ class DynamicTableState extends State<DynamicTable> {
           ),
         );
       }
-      
+           
       rows.add(DataRow2(
         cells: cells,
         selected: _source.data[i].selected,
