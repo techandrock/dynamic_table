@@ -259,7 +259,7 @@ class _MyAppState extends State<MyApp> {
                           onSort: (columnIndex, ascending) {},
                           dynamicTableInputType: DynamicTableInputType.text(
                             focusedBorderColor: Colors.red,
-                            textColor: Colors.white,
+                            textColor: Colors.white
                           )),
                       DynamicTableDataColumn(
                           label: const Text("Unique ID"),

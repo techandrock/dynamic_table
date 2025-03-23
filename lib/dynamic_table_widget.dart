@@ -559,7 +559,7 @@ class DynamicTableState extends State<DynamicTable> {
       columnList.add(
         DataColumn2(
           label: widget.actionColumnTitle ?? const Text("Actions"),
-          size: ColumnSize.S,
+          size: ColumnSize.M,
         ),
       );
     }
