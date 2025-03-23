@@ -421,7 +421,6 @@ class DynamicTableState extends State<DynamicTable> {
     _source.insertRow(index, values, isEditing: isEditing);
     // Scroll to the inserted row after the UI updates
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollToBottomOfParent();
     });
   }
 
@@ -439,6 +438,14 @@ class DynamicTableState extends State<DynamicTable> {
       if (addRowToEnd) {
         _source.data.add(newRow);
         // Schedule scrolling after the frame is rendered
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          print("Scrolling to bottom");
+          _scrollController.animateTo(
+            _scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        });
       } else {
         _source.data.insert(0, newRow);
       }
@@ -461,29 +468,9 @@ class DynamicTableState extends State<DynamicTable> {
       } else {
         _source.data.insert(0, newRow);
       }
-    });
-    
-    // Schedule scrolling after the frame is rendered
-    if (addRowToEnd) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _scrollToBottomOfParent();
-      });
-    }
+    });   
   }
-  
-  // Helper method to scroll to the bottom of the parent SingleChildScrollView
-  void _scrollToBottomOfParent() {
-    // Find the parent SingleChildScrollView
-    final scrollableState = Scrollable.maybeOf(context);
-    if (scrollableState != null) {
-      // Scroll to the bottom
-      scrollableState.position.animateTo(
-        scrollableState.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
-    }
-  }
+
 
   // Add this method to scroll to a specific row in the parent ScrollView
   void scrollToRow(int rowIndex) {
@@ -492,16 +479,12 @@ class DynamicTableState extends State<DynamicTable> {
     final headerHeight = widget.headingRowHeight;
     final approximatePosition = headerHeight + (rowIndex * rowHeight);
     
-    // Find the parent SingleChildScrollView
-    final scrollableState = Scrollable.maybeOf(context);
-    if (scrollableState != null) {
-      // Scroll to the calculated position
-      scrollableState.position.animateTo(
-        approximatePosition.clamp(0.0, scrollableState.position.maxScrollExtent),
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
-    }
+    // Scroll to the calculated position
+    _scrollController.animateTo(
+      approximatePosition.clamp(0.0, _scrollController.position.maxScrollExtent),
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
   }
 
   void deleteRow(int index) {
@@ -731,6 +714,7 @@ class DynamicTableState extends State<DynamicTable> {
             child: DataTable2(
               columns: _getDataTable2Columns(),
               rows: _getDataTable2Rows(),
+              scrollController: _scrollController,
               sortColumnIndex: widget.sortColumnIndex,
               sortAscending: widget.sortAscending,
               dataRowHeight: widget.dataRowMaxHeight,

@@ -414,21 +414,11 @@ class _MyAppState extends State<MyApp> {
                                     yourListOfMaps.add({'route': '${yourListOfMaps.length + 1}', 'score': ""});
                                     _tableKey.currentState?.addRowWithValues(yourListOfMaps.last.values.toList(), isEditing: true, addRowToEnd: true);
                                   }
-                                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                                    if (_scrollController.hasClients) {
-                                      _scrollController.animateTo(
-                                        _scrollController.position.maxScrollExtent,
-                                        duration: const Duration(milliseconds: 300),
-                                        curve: Curves.easeOut,
-                                      );
-                                    }
-                                  });
-                                  // Scroll to the last row that existed before adding new rows
-                                  // if (lastRowIndex >= 0) {
-                                  //   WidgetsBinding.instance.addPostFrameCallback((_) {
-                                  //     _tableKey.currentState?.scrollToRow(lastRowIndex);
-                                  //   });
-                                  // }
+                                   if (numberOfRows > 0) {
+                                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                                      _tableKey.currentState?.scrollToRow(lastRowIndex);
+                                    });
+                                  }
                                   
                                   Navigator.of(context).pop();
                                 },
