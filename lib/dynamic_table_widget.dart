@@ -704,35 +704,81 @@ class DynamicTableState extends State<DynamicTable> {
                 if (widget.header != null || (widget.showAddRowButton || widget.actions != null))
                   Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        if (widget.header != null) 
-                          Expanded(child: Center(child: widget.header)),
-                        if (widget.showAddRowButton || widget.actions != null)
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        // For narrow screens, use a column layout
+                        if (constraints.maxWidth < 600) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              if (widget.showAddRowButton)
-                                ElevatedButton.icon(
-                                  icon: Icon(Icons.add, color: widget.addButtonTextColor),
-                                  label: Text(widget.addButtonText ?? "Add Row", 
-                                      style: TextStyle(color: widget.addButtonTextColor)),
-                                  onPressed: () {
-                                    widget.onAddRowButtonPress != null 
-                                        ? widget.onAddRowButtonPress?.call() 
-                                        : addRow();
-                                  },
-                                  style: widget.addButtonColor != null 
-                                      ? ButtonStyle(
-                                          backgroundColor: WidgetStateProperty.all(widget.addButtonColor),
-                                        ) 
-                                      : null,
+                              if (widget.header != null)
+                                widget.header!,  // No Expanded here
+                              if (widget.showAddRowButton || widget.actions != null)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8.0),
+                                  child: Wrap(
+                                    spacing: 8.0,
+                                    runSpacing: 8.0,
+                                    alignment: WrapAlignment.center,
+                                    children: [
+                                      if (widget.showAddRowButton)
+                                        ElevatedButton.icon(
+                                          icon: Icon(Icons.add, color: widget.addButtonTextColor),
+                                          label: Text(widget.addButtonText ?? "Add Row", 
+                                              style: TextStyle(color: widget.addButtonTextColor)),
+                                          onPressed: () {
+                                            widget.onAddRowButtonPress != null 
+                                                ? widget.onAddRowButtonPress?.call() 
+                                                : addRow();
+                                          },
+                                          style: widget.addButtonColor != null 
+                                              ? ButtonStyle(
+                                                  backgroundColor: WidgetStateProperty.all(widget.addButtonColor),
+                                                ) 
+                                              : null,
+                                        ),
+                                      if (widget.actions != null) ...widget.actions!,
+                                    ],
+                                  ),
                                 ),
-                              if (widget.actions != null) ...widget.actions!,
                             ],
-                          ),
-                      ],
+                          );
+                        } else {
+                          // For wider screens, use a row layout
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              if (widget.header != null) 
+                                Expanded(child: widget.header!),
+                              if (widget.showAddRowButton || widget.actions != null)
+                                Wrap(
+                                  spacing: 8.0,
+                                  runSpacing: 8.0,
+                                  alignment: WrapAlignment.end,
+                                  children: [
+                                    if (widget.showAddRowButton)
+                                      ElevatedButton.icon(
+                                        icon: Icon(Icons.add, color: widget.addButtonTextColor),
+                                        label: Text(widget.addButtonText ?? "Add Row", 
+                                            style: TextStyle(color: widget.addButtonTextColor)),
+                                        onPressed: () {
+                                          widget.onAddRowButtonPress != null 
+                                              ? widget.onAddRowButtonPress?.call() 
+                                              : addRow();
+                                        },
+                                        style: widget.addButtonColor != null 
+                                            ? ButtonStyle(
+                                                backgroundColor: WidgetStateProperty.all(widget.addButtonColor),
+                                              ) 
+                                            : null,
+                                      ),
+                                    if (widget.actions != null) ...widget.actions!,
+                                  ],
+                                ),
+                            ],
+                          );
+                        }
+                      },
                     ),
                   ),
                 
@@ -752,35 +798,81 @@ class DynamicTableState extends State<DynamicTable> {
                 if (widget.header != null || (widget.showAddRowButton || widget.actions != null))
                   Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        if (widget.header != null) 
-                          Expanded(child: Center(child: widget.header)),
-                        if (widget.showAddRowButton || widget.actions != null)
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        // For narrow screens, use a column layout
+                        if (constraints.maxWidth < 600) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              if (widget.showAddRowButton)
-                                ElevatedButton.icon(
-                                  icon: Icon(Icons.add, color: widget.addButtonTextColor),
-                                  label: Text(widget.addButtonText ?? "Add Row", 
-                                      style: TextStyle(color: widget.addButtonTextColor)),
-                                  onPressed: () {
-                                    widget.onAddRowButtonPress != null 
-                                        ? widget.onAddRowButtonPress?.call() 
-                                        : addRow();
-                                  },
-                                  style: widget.addButtonColor != null 
-                                      ? ButtonStyle(
-                                          backgroundColor: WidgetStateProperty.all(widget.addButtonColor),
-                                        ) 
-                                      : null,
+                              if (widget.header != null)
+                                widget.header!,  // No Expanded here
+                              if (widget.showAddRowButton || widget.actions != null)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8.0),
+                                  child: Wrap(
+                                    spacing: 8.0,
+                                    runSpacing: 8.0,
+                                    alignment: WrapAlignment.center,
+                                    children: [
+                                      if (widget.showAddRowButton)
+                                        ElevatedButton.icon(
+                                          icon: Icon(Icons.add, color: widget.addButtonTextColor),
+                                          label: Text(widget.addButtonText ?? "Add Row", 
+                                              style: TextStyle(color: widget.addButtonTextColor)),
+                                          onPressed: () {
+                                            widget.onAddRowButtonPress != null 
+                                                ? widget.onAddRowButtonPress?.call() 
+                                                : addRow();
+                                          },
+                                          style: widget.addButtonColor != null 
+                                              ? ButtonStyle(
+                                                  backgroundColor: WidgetStateProperty.all(widget.addButtonColor),
+                                                ) 
+                                              : null,
+                                        ),
+                                      if (widget.actions != null) ...widget.actions!,
+                                    ],
+                                  ),
                                 ),
-                              if (widget.actions != null) ...widget.actions!,
                             ],
-                          ),
-                      ],
+                          );
+                        } else {
+                          // For wider screens, use a row layout
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              if (widget.header != null) 
+                                Expanded(child: widget.header!),
+                              if (widget.showAddRowButton || widget.actions != null)
+                                Wrap(
+                                  spacing: 8.0,
+                                  runSpacing: 8.0,
+                                  alignment: WrapAlignment.end,
+                                  children: [
+                                    if (widget.showAddRowButton)
+                                      ElevatedButton.icon(
+                                        icon: Icon(Icons.add, color: widget.addButtonTextColor),
+                                        label: Text(widget.addButtonText ?? "Add Row", 
+                                            style: TextStyle(color: widget.addButtonTextColor)),
+                                        onPressed: () {
+                                          widget.onAddRowButtonPress != null 
+                                              ? widget.onAddRowButtonPress?.call() 
+                                              : addRow();
+                                        },
+                                        style: widget.addButtonColor != null 
+                                            ? ButtonStyle(
+                                                backgroundColor: WidgetStateProperty.all(widget.addButtonColor),
+                                              ) 
+                                            : null,
+                                      ),
+                                    if (widget.actions != null) ...widget.actions!,
+                                  ],
+                                ),
+                            ],
+                          );
+                        }
+                      },
                     ),
                   ),
                 
