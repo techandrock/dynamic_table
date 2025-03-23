@@ -61,6 +61,9 @@ class DynamicTableDataColumn {
   /// The size of the column in DataTable2.
   final ColumnSize? size;
 
+  /// Whether this column is a DateTime column.
+  final bool isDateTimeColumn;
+
   /// Creates the configuration for a column of a [DynamicTable].
   ///
   /// The [label] argument must not be null.
@@ -73,5 +76,6 @@ class DynamicTableDataColumn {
       this.onSort,
       this.isEditable = true,
       required this.dynamicTableInputType,
-      this.size});
+      this.size,
+      this.isDateTimeColumn = false});
 }

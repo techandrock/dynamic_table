@@ -538,12 +538,18 @@ class DynamicTableState extends State<DynamicTable> {
 
   List<DataColumn2> _getDataTable2Columns() {
     List<DataColumn2> columnList = _columns.map((e) {
+      ColumnSize columnSize;
+      if (e.isDateTimeColumn) {
+        columnSize = ColumnSize.L;
+      } else {
+        columnSize = e.size ?? ColumnSize.S;
+      }
       return DataColumn2(
         label: e.label,
         numeric: e.numeric,
         tooltip: e.tooltip,
         onSort: e.onSort,
-        size: e.size ?? ColumnSize.M,
+        size: columnSize,
       );
     }).toList();
     
@@ -671,6 +677,8 @@ class DynamicTableState extends State<DynamicTable> {
       minWidth: widget.minDataTableWidth.toDouble(),
       columns: _getDataTable2Columns(),
       rows: _getDataTable2Rows(),
+      lmRatio: 2.0,
+      smRatio: 1.5,
       scrollController: _scrollController,
       sortColumnIndex: widget.sortColumnIndex,
       sortAscending: widget.sortAscending,

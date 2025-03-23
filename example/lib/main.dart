@@ -269,6 +269,7 @@ class _MyAppState extends State<MyApp> {
                       DynamicTableDataColumn(
                         label: const Text("Birth Date"),
                         onSort: (columnIndex, ascending) {},
+                        isDateTimeColumn: true,
                   
                         dynamicTableInputType: DynamicTableInputType.dateTime(
                           context: context,
@@ -346,7 +347,7 @@ class _MyAppState extends State<MyApp> {
                     backgroundColor: Colors.grey,
                     editButtonColor: Colors.blue,
                     deleteButtonColor: Colors.blue,
-                    columnSpacing: 56.0,
+                    columnSpacing: 0.0,
                     horizontalMargin: 10.0,
                     enablePagination: false,
                     minDataTableWidth: 400,
