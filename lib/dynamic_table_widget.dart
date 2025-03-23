@@ -302,9 +302,7 @@ class DynamicTable extends StatefulWidget {
 
   /// Called when the user clicks on the save icon of a row.
   ///
-  /// Return List<dynamic> [newValue] to allow the save action, null to prevent it.
-  ///
-  /// The [newValue] must be a list of the same length as the column.
+  /// Return Map<String, dynamic> [newValue] to allow the save action, null to prevent it.
   ///
   /// If the save action is allowed, the row will be saved to the table.
   ///
@@ -313,25 +311,33 @@ class DynamicTable extends StatefulWidget {
   ///
   /// ```dart
   ///
-  /// List<dynamic>? onRowSave(int index, List<dynamic> oldValue, List<dynamic> newValue) {
-  /// //Do some validation on new value and return null if validation fails
-  /// if (newValue[0] == null) {
+  /// Map<String, dynamic>? onRowSave(int index, List<dynamic> oldValue, List<dynamic> newValue) {
+  ///   //Do some validation on new value and return null if validation fails
+  ///   if (newValue[0] == null) {
   ///     ScaffoldMessenger.of(context).showSnackBar(
   ///       const SnackBar(
   ///         content: Text("Name cannot be null"),
-  ///          ),
+  ///       ),
   ///     );
-  ///   return null;
-  ///}
-  /// // Do some modification to `newValue` and return `newValue`
-  /// newValue[0] = newValue[0].toString().toUpperCase(); // Convert name to uppercase
-  /// // Save new data to you list
-  /// myData[index] = newValue;
-  /// return newValue;
+  ///     return null;
+  ///   }
+  ///   
+  ///   // Create a JSON object with the new values
+  ///   Map<String, dynamic> jsonData = {
+  ///     'name': newValue[0].toString().toUpperCase(), // Convert name to uppercase
+  ///     'age': newValue[1],
+  ///     'email': newValue[2],
+  ///   };
+  ///   
+  ///   // Save data to your backend or state
+  ///   myData[index] = jsonData;
+  ///   
+  ///   // Return the JSON object to update the table
+  ///   return jsonData;
   /// }
   /// ```
   ///
-  final List<dynamic>? Function(
+  final Map<String, dynamic>? Function(
       int index, List<dynamic> oldValue, List<dynamic> newValue)? onRowSave;
 
   /// The data for the rows of the table.
@@ -575,7 +581,21 @@ class DynamicTableState extends State<DynamicTable> {
       actionColumnTitle: widget.actionColumnTitle!,
       onRowEdit: widget.onRowEdit,
       onRowDelete: widget.onRowDelete,
-      onRowSave: widget.onRowSave,
+      onRowSave: widget.onRowSave != null 
+          ? (index, oldValue, newValue) {
+              // Convert Map<String, dynamic>? to List<dynamic>?
+              final result = widget.onRowSave!(index, oldValue, newValue);
+              if (result == null) return null;
+              
+              // Convert the map back to a list in the correct column order
+              List<dynamic> valuesList = [];
+              for (int i = 0; i < _columns.length; i++) {
+                String columnName = _getColumnName(i);
+                valuesList.add(result.containsKey(columnName) ? result[columnName] : null);
+              }
+              return valuesList;
+            }
+          : null,
       editButtonColor: widget.editButtonColor,
       saveButtonColor: widget.saveButtonColor,
       deleteButtonColor: widget.deleteButtonColor,
@@ -1234,9 +1254,20 @@ class DynamicTableState extends State<DynamicTable> {
       // Process values through callback if provided
       List<dynamic> valuesToSave = newValues;
       if (widget.onRowSave != null) {
-        List<dynamic>? result = widget.onRowSave!(index, oldValues, newValues);
+        Map<String, dynamic>? result = widget.onRowSave!(index, oldValues, newValues);
         if (result != null) {
-          valuesToSave = result;
+          // Convert JSON object back to list for table display
+          // We need to maintain the same order as columns
+          valuesToSave = [];
+          for (int j = 0; j < _columns.length; j++) {
+            String columnName = _getColumnName(j);
+            if (result.containsKey(columnName)) {
+              valuesToSave.add(result[columnName]);
+            } else {
+              // If the column isn't in the JSON, keep the original value
+              valuesToSave.add(j < newValues.length ? newValues[j] : null);
+            }
+          }
         } else {
           // If callback returns null, don't save
           return;
@@ -1257,5 +1288,87 @@ class DynamicTableState extends State<DynamicTable> {
         _source.cancelEdit(index);
       });
     }
+  }
+
+  // Helper method to get column name from index
+  String _getColumnName(int columnIndex) {
+    if (columnIndex < 0 || columnIndex >= _columns.length) {
+      return "column_$columnIndex";
+    }
+    
+    String columnName = _columns[columnIndex].label.toString();
+    // Try to extract text from the label widget if it's a Text widget
+    if (_columns[columnIndex].label is Text) {
+      columnName = (_columns[columnIndex].label as Text).data ?? columnName;
+    }
+    return columnName;
+  }
+
+  /// Gets all rows data in JSON format
+  Map<String, dynamic> getAllRowsAsJson() {
+    List<Map<String, dynamic>> rowsData = [];
+    
+    for (int i = 0; i < _source.data.length; i++) {
+      Map<String, dynamic> rowData = {};
+      
+      // Get column names and values
+      for (int j = 0; j < _columns.length && j < _source.data[i].cells.length; j++) {
+        String columnName = _columns[j].label.toString();
+        // Try to extract text from the label widget if it's a Text widget
+        if (_columns[j].label is Text) {
+          columnName = (_columns[j].label as Text).data ?? columnName;
+        }
+        
+        // Use the column name as key and cell value as value
+        rowData[columnName] = _source.data[i].cells[j].value;
+      }
+      
+      rowsData.add(rowData);
+    }
+    
+    return {
+      'rows': rowsData,
+      'totalRows': _source.data.length,
+    };
+  }
+  
+  /// Gets all edited rows data in JSON format
+  Map<String, dynamic> getEditedRowsAsJson() {
+    List<Map<String, dynamic>> rowsData = [];
+    
+    for (int i = 0; i < _source.data.length; i++) {
+      if (_source.data[i].isEditing) {
+        Map<String, dynamic> rowData = {};
+        List<dynamic> editedValues = _source.getEditedRowValues(i);
+        
+        // Get column names and values
+        for (int j = 0; j < _columns.length && j < editedValues.length; j++) {
+          String columnName = _columns[j].label.toString();
+          // Try to extract text from the label widget if it's a Text widget
+          if (_columns[j].label is Text) {
+            columnName = (_columns[j].label as Text).data ?? columnName;
+          }
+          
+          // Use the column name as key and edited value as value
+          rowData[columnName] = editedValues[j];
+        }
+        
+        rowsData.add(rowData);
+      }
+    }
+    
+    return {
+      'rows': rowsData,
+      'totalEditedRows': rowsData.length,
+    };
+  }
+
+  /// Saves all rows and returns the data in JSON format
+  Map<String, dynamic> saveAllRowsAndGetJson() {
+    // First save all rows
+    saveAllRows();
+    
+    // Then return all data as JSON
+    return getAllRowsAsJson();
   }
 }

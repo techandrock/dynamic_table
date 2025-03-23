@@ -59,6 +59,29 @@ class _MyAppState extends State<MyApp> {
                     saveButtonColor: Colors.purple,
                     deleteButtonColor: Colors.red,
                     cancelButtonColor: Colors.grey,
+                    actions: [
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.edit, color: Colors.white),
+                        label: const Text("Edit All", style: TextStyle(color: Colors.white)),
+                        onPressed: () {
+                          tableKey.currentState?.editAllRows();
+                        },
+                        style: ButtonStyle(
+                          backgroundColor: WidgetStateProperty.all(Colors.blue),
+                        ),
+                      ),
+                      // Add Save All button
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.save, color: Colors.white),
+                        label: const Text("Save All", style: TextStyle(color: Colors.white)),
+                        onPressed: () {
+                          Map<String, dynamic> jsonData = tableKey.currentState?.saveAllRowsAndGetJson() ?? {};
+                        },
+                        style: ButtonStyle(
+                          backgroundColor: WidgetStateProperty.all(Colors.green),
+                        ),
+                      ),
+                    ],
                     onAddRowButtonPress: () {
                     showDialog(
                       context: context,
@@ -130,54 +153,34 @@ class _MyAppState extends State<MyApp> {
                       return true;
                     },
                     onRowSave: (index, old, newValue) {
-                      // ScaffoldMessenger.of(context).showSnackBar(
-                      //   SnackBar(
-                      //     content:
-                      //         Text("Row Saved index:$index old:$old new:$newValue"),
-                      //   ),
-                      // );
+                      
+                      // Validation checks
                       if (newValue[0] == null) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Name cannot be null"),
-                          ),
+                          const SnackBar(content: Text("Name cannot be null")),
                         );
                         return null;
                       }
-                  
+                      
                       if (newValue[0].toString().length < 3) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Name must be atleast 3 characters long"),
-                          ),
+                          const SnackBar(content: Text("Name must be atleast 3 characters long")),
                         );
                         return null;
                       }
-                      if (newValue[0].toString().length > 20) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content:
-                                Text("Name must be less than 20 characters long"),
-                          ),
-                        );
-                        return null;
-                      }
-                      if (newValue[1] == null) {
-                        //If newly added row then add unique ID
-                        newValue[1] = Random()
-                            .nextInt(500)
-                            .toString(); // to add Unique ID because it is not editable
-                      }
-                      myData[index] = newValue; // Update data
-                      if (newValue[0] == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Name cannot be null"),
-                          ),
-                        );
-                        return null;
-                      }
-                      return newValue;
+                      
+                      // Create a Map to return instead of the List
+                      Map<String, dynamic> rowData = {
+                        'Name': newValue[0],
+                        'Unique ID': newValue[1] ?? Random().nextInt(500).toString(),
+                        'Birth Date': newValue[2],
+                        'Gender': newValue[3],
+                        'Other Info': newValue[4],
+                      };
+                      
+                      // Update your data
+                      myData[index] = newValue.toList(); // Keep your existing data structure
+                      return rowData; // Return the Map
                     },
                     showActions: true,
                     showAddRowButton: true,
@@ -211,26 +214,7 @@ class _MyAppState extends State<MyApp> {
                         ),
                       );
                     },
-                    actions: [
-                      IconButton(
-                        onPressed: () {
-                          for (var i = 0; i < myData.length; i += 2) {
-                            tableKey.currentState?.selectRow(i, isSelected: true);
-                          }
-                        },
-                        icon: const Icon(Icons.select_all),
-                        tooltip: "Select all odd Values",
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          for (var i = 0; i < myData.length; i += 2) {
-                            tableKey.currentState?.selectRow(i, isSelected: false);
-                          }
-                        },
-                        icon: const Icon(Icons.deselect_outlined),
-                        tooltip: "Unselect all odd Values",
-                      ),
-                    ],
+                    
                     rows: List.generate(
                       myData.length,
                       (index) => DynamicTableDataRow(
@@ -369,7 +353,7 @@ class _MyAppState extends State<MyApp> {
                         icon: const Icon(Icons.save, color: Colors.white),
                         label: const Text("Save All", style: TextStyle(color: Colors.white)),
                         onPressed: () {
-                          _tableKey.currentState?.saveAllRows();
+                          Map<String, dynamic> jsonData = _tableKey.currentState?.saveAllRowsAndGetJson() ?? {};
                         },
                         style: ButtonStyle(
                           backgroundColor: WidgetStateProperty.all(Colors.green),
