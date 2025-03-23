@@ -349,6 +349,7 @@ class _MyAppState extends State<MyApp> {
                     columnSpacing: 56.0,
                     horizontalMargin: 10.0,
                     enablePagination: false,
+                    minDataTableWidth: 400,
                     actions: [
                       // Add Edit All button
                       ElevatedButton.icon(

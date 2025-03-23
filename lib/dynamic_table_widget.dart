@@ -96,6 +96,7 @@ class DynamicTable extends StatefulWidget {
     this.onAddRowButtonPress,
     this.showOnlyNonEmptyRows = false,
     this.enablePagination = true,
+    this.minDataTableWidth = 1000,
   })  : assert(() {
           if ((onRowEdit == null && onRowSave != null) ||
               (onRowEdit != null && onRowSave == null)) {
@@ -384,6 +385,7 @@ class DynamicTable extends StatefulWidget {
 
 
   final bool showOnlyNonEmptyRows;
+  final int minDataTableWidth; // Minimum width of the table so that it doesn't shrink below a certain width and allows horizontal scrolling
 
   /// Whether to enable pagination for the table.
   /// If set to false, all rows will be displayed without pagination controls.
@@ -666,7 +668,7 @@ class DynamicTableState extends State<DynamicTable> {
     
     // Create the table content
     Widget tableContent = DataTable2(
-      minWidth: 400,
+      minWidth: widget.minDataTableWidth.toDouble(),
       columns: _getDataTable2Columns(),
       rows: _getDataTable2Rows(),
       scrollController: _scrollController,
