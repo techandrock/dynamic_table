@@ -666,6 +666,7 @@ class DynamicTableState extends State<DynamicTable> {
     
     // Create the table content
     Widget tableContent = DataTable2(
+      minWidth: 400,
       columns: _getDataTable2Columns(),
       rows: _getDataTable2Rows(),
       scrollController: _scrollController,
