@@ -390,8 +390,8 @@ class DynamicTableState extends State<DynamicTable> {
     _source.addRow(addRowToEnd: addRowToEnd);
   }
 
-  void addRowWithValues(List<dynamic> values, {bool isEditing = false}) {
-    _source.addRowWithValues(values, isEditing: isEditing);
+  void addRowWithValues(List<dynamic> values, {bool isEditing = false, bool addRowToEnd = true}) {
+    _source.addRowWithValues(values, isEditing: isEditing, addRowToEnd: addRowToEnd);
   }
 
   void deleteRow(int index) {

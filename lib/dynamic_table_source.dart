@@ -102,8 +102,8 @@ class DynamicTableSource extends DataTableSource {
     insertRow(addRowToEnd ? data.length : 0, List.filled(columns.length, null), isEditing: true);
   }
 
-  void addRowWithValues(List<dynamic> values, {bool isEditing = false}) {
-    insertRow(0, values, isEditing: isEditing);
+  void addRowWithValues(List<dynamic> values, {bool isEditing = false, bool addRowToEnd = true}) {
+    insertRow(addRowToEnd ? data.length : 0, values, isEditing: isEditing);
   }
 
   // void _deleteUnsavedRows() {
