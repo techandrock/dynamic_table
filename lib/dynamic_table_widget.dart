@@ -1,9 +1,12 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:data_table_2/data_table_2.dart';
+import 'dart:math' as math;
 
 import 'package:dynamic_table/dynamic_table_data_column.dart';
 import 'package:dynamic_table/dynamic_table_data_row.dart';
 import 'package:dynamic_table/dynamic_table_source.dart';
+import 'package:dynamic_table/dynamic_table_data_cell.dart';
 
 class DynamicTable extends StatefulWidget {
   /// Creates a widget describing a paginated [DataTable] on a [Card].
@@ -416,24 +419,50 @@ class DynamicTableState extends State<DynamicTable> {
     });
   }
 
-  void addRow({bool addRowToEnd = true}) {
-    _source.addRow(addRowToEnd: addRowToEnd);
-    // Scroll to the new row after the UI updates
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollToBottomOfParent();
+  void addRow({bool addRowToEnd = false}) {
+    setState(() {
+      final newRow = DynamicTableDataRow(
+        index: _source.data.length,
+        cells: List.generate(
+          _columns.length,
+          (index) => DynamicTableDataCell(value: null),
+        ),
+        isEditing: true,
+      );
+      
+      if (addRowToEnd) {
+        _source.data.add(newRow);
+        // Schedule scrolling after the frame is rendered
+      } else {
+        _source.data.insert(0, newRow);
+      }
     });
   }
 
-  void addRowWithValues(List<dynamic> values, {bool isEditing = false, bool addRowToEnd = true, bool isSelectable = false}) {
-    _source.addRowWithValues(values, isEditing: isEditing, addRowToEnd: addRowToEnd, isSelectable: isSelectable);
-    
-    // Update the internal state first
+  void addRowWithValues(List<dynamic> values, {bool isEditing = false, bool addRowToEnd = false}) {
     setState(() {
-      _rowsPerPage = 10;
+      final newRow = DynamicTableDataRow(
+        index: _source.data.length,
+        cells: List.generate(
+          values.length,
+          (index) => DynamicTableDataCell(value: values[index]),
+        ),
+        isEditing: isEditing,
+      );
+      
+      if (addRowToEnd) {
+        _source.data.add(newRow);
+      } else {
+        _source.data.insert(0, newRow);
+      }
     });
     
-    // Then notify the parent if needed
-    widget.onRowsPerPageChanged?.call(10);
+    // Schedule scrolling after the frame is rendered
+    if (addRowToEnd) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollToBottomOfParent();
+      });
+    }
   }
   
   // Helper method to scroll to the bottom of the parent SingleChildScrollView
@@ -517,18 +546,22 @@ class DynamicTableState extends State<DynamicTable> {
     _columns = [...widget.columns];
   }
 
-  List<DataColumn> _getTableColumns() {
-    List<DataColumn> columnList = _columns.map((e) {
-      return DataColumn(
-          label: e.label,
-          numeric: e.numeric,
-          tooltip: e.tooltip,
-          onSort: e.onSort);
+  List<DataColumn2> _getDataTable2Columns() {
+    List<DataColumn2> columnList = _columns.map((e) {
+      return DataColumn2(
+        label: e.label,
+        numeric: e.numeric,
+        tooltip: e.tooltip,
+        onSort: e.onSort,
+        size: e.size ?? ColumnSize.M,
+      );
     }).toList();
+    
     if (widget.showActions || widget.showDeleteAction) {
       columnList.add(
-        DataColumn(
+        DataColumn2(
           label: widget.actionColumnTitle ?? const Text("Actions"),
+          size: ColumnSize.S,
         ),
       );
     }
@@ -643,56 +676,81 @@ class DynamicTableState extends State<DynamicTable> {
       effectiveRowsPerPage = dataRowCount > 0 ? dataRowCount : 1;
     }
     
-    final tableWidget = PaginatedDataTable(
-      header: Center(child: widget.header),
-      actions: [
-        if (widget.showAddRowButton)
-          ElevatedButton.icon(
-            icon: Icon(Icons.add, color: widget.addButtonTextColor,),
-            label: Text(widget.addButtonText ?? "Add Row", style: TextStyle(color: widget.addButtonTextColor),),
-            onPressed: () {
-              widget.onAddRowButtonPress != null ? widget.onAddRowButtonPress?.call() : addRow();
-            },
-            style: widget.addButtonColor != null 
-              ? ButtonStyle(
-                  backgroundColor: WidgetStateProperty.all(widget.addButtonColor),
-                ) 
-              : null,
+    // Replace PaginatedDataTable with DataTable2
+    final tableWidget = Card(
+      color: widget.backgroundColor,
+      elevation: 0,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (widget.header != null || (widget.showAddRowButton || widget.actions != null))
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  if (widget.header != null) 
+                    Expanded(child: Center(child: widget.header)),
+                  if (widget.showAddRowButton || widget.actions != null)
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (widget.showAddRowButton)
+                          ElevatedButton.icon(
+                            icon: Icon(Icons.add, color: widget.addButtonTextColor),
+                            label: Text(widget.addButtonText ?? "Add Row", 
+                                style: TextStyle(color: widget.addButtonTextColor)),
+                            onPressed: () {
+                              widget.onAddRowButtonPress != null 
+                                  ? widget.onAddRowButtonPress?.call() 
+                                  : addRow();
+                            },
+                            style: widget.addButtonColor != null 
+                                ? ButtonStyle(
+                                    backgroundColor: WidgetStateProperty.all(widget.addButtonColor),
+                                  ) 
+                                : null,
+                          ),
+                        if (widget.actions != null) ...widget.actions!,
+                      ],
+                    ),
+                ],
+              ),
+            ),
+          
+          // Replace Expanded with a Container with fixed height or SizedBox
+          Container(
+            height: 150,
+            child: DataTable2(
+              columns: _getDataTable2Columns(),
+              rows: _getDataTable2Rows(),
+              sortColumnIndex: widget.sortColumnIndex,
+              sortAscending: widget.sortAscending,
+              dataRowHeight: widget.dataRowMaxHeight,
+              headingRowHeight: widget.headingRowHeight,
+              horizontalMargin: widget.horizontalMargin,
+              columnSpacing: widget.columnSpacing,
+              showCheckboxColumn: widget.showCheckboxColumn,
+              dividerThickness: widget.dividerThickness,
+              border: TableBorder(
+                horizontalInside: BorderSide(
+                  color: widget.dividerColor ?? theme.dividerColor,
+                  width: widget.dividerThickness ?? 1.0,
+                ),
+              ),
+              onSelectAll: (value) {
+                selectAllRows(isSelected: value ?? false);
+                widget.onSelectAll?.call(value);
+              },
+              checkboxHorizontalMargin: widget.checkboxHorizontalMargin,
+            ),
           ),
-        ...?widget.actions,
-      ],
-      columns: _getTableColumns(),
-      sortColumnIndex: widget.sortColumnIndex,
-      sortAscending: widget.sortAscending,
-      onSelectAll: (value) {
-        selectAllRows(isSelected: value ?? false);
-        widget.onSelectAll?.call(value);
-      },
-      dataRowMinHeight: widget.dataRowMinHeight,
-      dataRowMaxHeight: widget.dataRowMaxHeight,
-      headingRowHeight: widget.headingRowHeight,
-      horizontalMargin: widget.horizontalMargin,
-      columnSpacing: widget.columnSpacing,
-      showCheckboxColumn: widget.showCheckboxColumn,
-      showFirstLastButtons: widget.showFirstLastButtons,
-      initialFirstRowIndex: widget.initialFirstRowIndex,
-      onPageChanged: widget.onPageChanged,
-      rowsPerPage: effectiveRowsPerPage,
-      availableRowsPerPage: widget.availableRowsPerPage,
-      onRowsPerPageChanged: widget.onRowsPerPageChanged != null
-          ? (value) {
-              setState(() {
-                _rowsPerPage = value!;
-              });
-              widget.onRowsPerPageChanged?.call(value);
-            }
-          : null,
-      dragStartBehavior: widget.dragStartBehavior,
-      arrowHeadColor: widget.paginationButtonColor,
-      source: _source,
-      checkboxHorizontalMargin: widget.checkboxHorizontalMargin,
-      controller: _scrollController, // Use our controller instead of widget.controller
-      primary: widget.primary,
+          
+          // Custom pagination controls
+          _buildPaginationControls(),
+        ],
+      ),
     );
     
     if (customTheme != null) {
@@ -707,31 +765,205 @@ class DynamicTableState extends State<DynamicTable> {
     
     return tableWidget;
   }
-
-  // Add this method to set all rows to edit mode
-  void editAllRows() {
-    for (int i = 0; i < _source.rowCount; i++) {
-      _source.setRowEditingState(i, isEditing: true);
+  
+  // New method to create DataTable2 rows from source
+  List<DataRow2> _getDataTable2Rows() {
+    List<DataRow2> rows = [];
+    
+    // Get the current page of data
+    int startIndex = _currentPage * effectiveRowsPerPage;
+    int endIndex = startIndex + effectiveRowsPerPage;
+    if (endIndex > _source.rowCount) endIndex = _source.rowCount;
+    
+    for (int i = startIndex; i < endIndex; i++) {
+      // Skip empty rows if configured to do so
+      if (widget.showOnlyNonEmptyRows) {
+        bool hasData = _source.data[i].cells.any(
+          (cell) => cell.value != null && cell.value.toString().isNotEmpty
+        );
+        if (!hasData && !_source.data[i].isEditing) continue;
+      }
+      
+      rows.add(DataRow2(
+        cells: _source.getRow(i)?.cells ?? [],
+        selected: _source.data[i].selected,
+        onSelectChanged: _source.data[i].isSelectable 
+            ? (selected) => _source.selectRow(i, isSelected: selected ?? false)
+            : null,
+        onTap: () {
+          // Handle row tap if needed
+        },
+      ));
     }
-    setState(() {});
+    
+    return rows;
+  }
+  
+  // Add pagination state variables
+  int _currentPage = 0;
+  int get _pageCount => (_source.rowCount / effectiveRowsPerPage).ceil();
+  
+  // Build custom pagination controls
+  Widget _buildPaginationControls() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // Rows per page dropdown
+          if (widget.onRowsPerPageChanged != null)
+            Row(
+              children: [
+                Text('Rows per page:'),
+                SizedBox(width: 8),
+                DropdownButton<int>(
+                  value: _rowsPerPage,
+                  items: widget.availableRowsPerPage.map((int value) {
+                    return DropdownMenuItem<int>(
+                      value: value,
+                      child: Text('$value'),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _rowsPerPage = value!;
+                      _currentPage = 0; // Reset to first page
+                    });
+                    widget.onRowsPerPageChanged?.call(value);
+                  },
+                ),
+              ],
+            ),
+          
+          // Page navigation
+          Row(
+            children: [
+              Text('${startIndex + 1}-${endIndex} of ${_source.rowCount}'),
+              SizedBox(width: 16),
+              // First page button
+              if (widget.showFirstLastButtons)
+                IconButton(
+                  icon: Icon(Icons.first_page),
+                  onPressed: _currentPage > 0
+                      ? () {
+                          setState(() {
+                            _currentPage = 0;
+                          });
+                          widget.onPageChanged?.call(_currentPage * effectiveRowsPerPage);
+                        }
+                      : null,
+                  color: widget.paginationButtonColor,
+                ),
+              // Previous page button
+              IconButton(
+                icon: Icon(Icons.chevron_left),
+                onPressed: _currentPage > 0
+                    ? () {
+                        setState(() {
+                          _currentPage--;
+                        });
+                        widget.onPageChanged?.call(_currentPage * effectiveRowsPerPage);
+                      }
+                    : null,
+                color: widget.paginationButtonColor,
+              ),
+              // Next page button
+              IconButton(
+                icon: Icon(Icons.chevron_right),
+                onPressed: _currentPage < _pageCount - 1
+                    ? () {
+                        setState(() {
+                          _currentPage++;
+                        });
+                        widget.onPageChanged?.call(_currentPage * effectiveRowsPerPage);
+                      }
+                    : null,
+                color: widget.paginationButtonColor,
+              ),
+              // Last page button
+              if (widget.showFirstLastButtons)
+                IconButton(
+                  icon: Icon(Icons.last_page),
+                  onPressed: _currentPage < _pageCount - 1
+                      ? () {
+                          setState(() {
+                            _currentPage = _pageCount - 1;
+                          });
+                          widget.onPageChanged?.call(_currentPage * effectiveRowsPerPage);
+                        }
+                      : null,
+                  color: widget.paginationButtonColor,
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+  
+  // Helper properties for pagination
+  int get startIndex => _currentPage * effectiveRowsPerPage;
+  int get endIndex => math.min(startIndex + effectiveRowsPerPage, _source.rowCount);
+  int get effectiveRowsPerPage {
+    if (widget.showOnlyNonEmptyRows) {
+      // Count how many rows actually have data
+      int dataRowCount = _source.data.where((row) {
+        return row.cells.any((cell) => cell.value != null && cell.value.toString().isNotEmpty);
+      }).length;
+      
+      // Check if any row is in editing mode (being added)
+      bool hasEditingRow = _source.data.any((row) => row.isEditing);
+      
+      // If a row is being added/edited, include it in the count
+      if (hasEditingRow) {
+        dataRowCount += 1;
+      }
+      
+      // Use the count of data rows or minimum of 1 if no data rows
+      return dataRowCount > 0 ? dataRowCount : 1;
+    }
+    return _rowsPerPage;
   }
 
-  // Add this method to save all rows that are in edit mode
+  /// Puts all rows in edit mode
+  void editAllRows() {
+    setState(() {
+      for (int i = 0; i < _source.data.length; i++) {
+        // Get the current values before setting edit mode
+        List<dynamic> currentValues = _source.getRowValues(i);
+        
+        // Set the row to edit mode
+        _source.data[i].isEditing = true;
+        
+        // Initialize the editing values with the current values
+        _source.initializeEditingValues(i, currentValues);
+      }
+    });
+  }
+  
+  /// Saves all rows that are currently in edit mode
   void saveAllRows() {
-    List<int> editingRowIndices = [];
-    
-    // First, collect all rows that are in edit mode
-    for (int i = 0; i < _source.rowCount; i++) {
-      if (_source.isRowEditing(i)) {
-        editingRowIndices.add(i);
+    for (int i = 0; i < _source.data.length; i++) {
+      if (_source.data[i].isEditing) {
+        saveRow(i);
       }
     }
-    
-    // Then save each row
-    for (int index in editingRowIndices) {
-      _source.saveRow(index);
+  }
+
+  /// Saves a specific row
+  void saveRow(int index) {
+    if (_source.data[index].isEditing) {
+      List<dynamic> oldValues = _source.getRowValues(index);
+      List<dynamic> newValues = _source.getEditedRowValues(index);
+      
+      if (widget.onRowSave != null) {
+        List<dynamic>? result = widget.onRowSave!(index, oldValues, newValues);
+        if (result != null) {
+          _source.saveRow(index, result);
+        }
+      } else {
+        _source.saveRow(index, newValues);
+      }
     }
-    
-    setState(() {});
   }
 }

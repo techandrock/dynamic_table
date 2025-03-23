@@ -524,39 +524,32 @@ class DynamicTableSource extends DataTableSource {
     return false;
   }
 
-  // Save a row that's in edit mode
-  void saveRow(int index) {
-    if (index >= 0 && index < data.length && data[index].isEditing) {
-      // Get the current values
-      List<dynamic> oldValues = data[index].cells.map((cell) => cell.value).toList();
-      
-      // Use _editingValues for the new values
-      List<dynamic> newValues = [];
-      for (int i = 0; i < columns.length; i++) {
-        if (columns[i].isEditable) {
-          newValues.add(_editingValues[index]?[i] ?? oldValues[i]);
-        } else {
-          newValues.add(oldValues[i]);
-        }
-      }
-      
-      // Call the onRowSave callback if provided
-      var response = onRowSave?.call(index, oldValues, newValues);
-      if (onRowSave != null && response == null) {
-        return;
-      }
-      if (response != null) {
-        newValues = response;
-      }
-      
-      // Update the values
-      for (int i = 0; i < data[index].cells.length; i++) {
-        data[index].cells[i].value = newValues[i];
-      }
-      
-      data[index].isEditing = false;
-      _unsavedRows.remove(index);
-      _disposeInputAt(index);
+  /// Gets the current values of a row
+  List<dynamic> getRowValues(int index) {
+    return data[index].cells.map((cell) => cell.value).toList();
+  }
+  
+  /// Gets the edited values of a row (from editing values if in edit mode)
+  List<dynamic> getEditedRowValues(int index) {
+    if (_editingValues.containsKey(index)) {
+      return _editingValues[index]!;
+    }
+    return getRowValues(index);
+  }
+  
+  /// Saves the edited values to a row
+  void saveRow(int index, List<dynamic> values) {
+    for (int i = 0; i < values.length && i < data[index].cells.length; i++) {
+      data[index].cells[i].value = values[i];
+    }
+    data[index].isEditing = false;
+    notifyListeners();
+  }
+
+  /// Initialize editing values for a row with its current values
+  void initializeEditingValues(int index, List<dynamic> values) {
+    if (index >= 0 && index < data.length) {
+      _editingValues[index] = List.from(values);
       notifyListeners();
     }
   }

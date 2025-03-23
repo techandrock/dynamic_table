@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:data_table_2/data_table_2.dart';
 
 import 'package:dynamic_table/dynamic_table.dart';
 
@@ -57,6 +58,9 @@ class DynamicTableDataColumn {
   /// Default value is true.
   final bool isEditable;
 
+  /// The size of the column in DataTable2.
+  final ColumnSize? size;
+
   /// Creates the configuration for a column of a [DynamicTable].
   ///
   /// The [label] argument must not be null.
@@ -68,5 +72,6 @@ class DynamicTableDataColumn {
       this.numeric = false,
       this.onSort,
       this.isEditable = true,
-      required this.dynamicTableInputType});
+      required this.dynamicTableInputType,
+      this.size});
 }
