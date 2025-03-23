@@ -497,4 +497,67 @@ class DynamicTableSource extends DataTableSource {
       onTapCancel: cell.onTapCancel,
     );
   }
+
+  // Set a row's editing state
+  void setRowEditingState(int index, {required isEditing}) {
+    if (index >= 0 && index < data.length) {
+      // Only change state if it's different
+      if (data[index].isEditing != isEditing) {
+        // If entering edit mode, initialize editing values
+        if (isEditing) {
+          _editingValues[index] = data[index].cells.map((e) {
+            return e.value;
+          }).toList();
+        }
+        
+        data[index].isEditing = isEditing;
+        notifyListeners();
+      }
+    }
+  }
+
+  // Check if a row is in edit mode
+  bool isRowEditing(int index) {
+    if (index >= 0 && index < data.length) {
+      return data[index].isEditing;
+    }
+    return false;
+  }
+
+  // Save a row that's in edit mode
+  void saveRow(int index) {
+    if (index >= 0 && index < data.length && data[index].isEditing) {
+      // Get the current values
+      List<dynamic> oldValues = data[index].cells.map((cell) => cell.value).toList();
+      
+      // Use _editingValues for the new values
+      List<dynamic> newValues = [];
+      for (int i = 0; i < columns.length; i++) {
+        if (columns[i].isEditable) {
+          newValues.add(_editingValues[index]?[i] ?? oldValues[i]);
+        } else {
+          newValues.add(oldValues[i]);
+        }
+      }
+      
+      // Call the onRowSave callback if provided
+      var response = onRowSave?.call(index, oldValues, newValues);
+      if (onRowSave != null && response == null) {
+        return;
+      }
+      if (response != null) {
+        newValues = response;
+      }
+      
+      // Update the values
+      for (int i = 0; i < data[index].cells.length; i++) {
+        data[index].cells[i].value = newValues[i];
+      }
+      
+      data[index].isEditing = false;
+      _unsavedRows.remove(index);
+      _disposeInputAt(index);
+      notifyListeners();
+    }
+  }
 }

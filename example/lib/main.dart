@@ -348,8 +348,30 @@ class _MyAppState extends State<MyApp> {
                     deleteButtonColor: Colors.blue,
                     columnSpacing: 56.0,
                     horizontalMargin: 10.0,
-                    actions: const [],
-                    
+                    actions: [
+                      // Add Edit All button
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.edit, color: Colors.white),
+                        label: const Text("Edit All", style: TextStyle(color: Colors.white)),
+                        onPressed: () {
+                          _tableKey.currentState?.editAllRows();
+                        },
+                        style: ButtonStyle(
+                          backgroundColor: WidgetStateProperty.all(Colors.blue),
+                        ),
+                      ),
+                      // Add Save All button
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.save, color: Colors.white),
+                        label: const Text("Save All", style: TextStyle(color: Colors.white)),
+                        onPressed: () {
+                          _tableKey.currentState?.saveAllRows();
+                        },
+                        style: ButtonStyle(
+                          backgroundColor: WidgetStateProperty.all(Colors.green),
+                        ),
+                      ),
+                    ],
                     onAddRowButtonPress: () {
                       showDialog(
                         context: context,

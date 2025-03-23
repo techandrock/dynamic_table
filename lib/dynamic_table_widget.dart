@@ -707,4 +707,31 @@ class DynamicTableState extends State<DynamicTable> {
     
     return tableWidget;
   }
+
+  // Add this method to set all rows to edit mode
+  void editAllRows() {
+    for (int i = 0; i < _source.rowCount; i++) {
+      _source.setRowEditingState(i, isEditing: true);
+    }
+    setState(() {});
+  }
+
+  // Add this method to save all rows that are in edit mode
+  void saveAllRows() {
+    List<int> editingRowIndices = [];
+    
+    // First, collect all rows that are in edit mode
+    for (int i = 0; i < _source.rowCount; i++) {
+      if (_source.isRowEditing(i)) {
+        editingRowIndices.add(i);
+      }
+    }
+    
+    // Then save each row
+    for (int index in editingRowIndices) {
+      _source.saveRow(index);
+    }
+    
+    setState(() {});
+  }
 }
