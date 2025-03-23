@@ -95,6 +95,7 @@ class DynamicTable extends StatefulWidget {
     this.addButtonTextColor,
     this.onAddRowButtonPress,
     this.showOnlyNonEmptyRows = false,
+    this.enablePagination = true,
   })  : assert(() {
           if ((onRowEdit == null && onRowSave != null) ||
               (onRowEdit != null && onRowSave == null)) {
@@ -384,6 +385,11 @@ class DynamicTable extends StatefulWidget {
 
   final bool showOnlyNonEmptyRows;
 
+  /// Whether to enable pagination for the table.
+  /// If set to false, all rows will be displayed without pagination controls.
+  /// Defaults to true.
+  final bool enablePagination;
+
   @override
   State<DynamicTable> createState() => DynamicTableState();
 }
@@ -657,7 +663,7 @@ class DynamicTableState extends State<DynamicTable> {
     }
     
     // Calculate effective rowsPerPage
-    int effectiveRowsPerPage = _rowsPerPage;
+    int effectiveRowsPerPage = widget.enablePagination ? _rowsPerPage : _source.rowCount;
     if (widget.showOnlyNonEmptyRows) {
       // Count how many rows actually have data
       int dataRowCount = _source.data.where((row) {
@@ -747,8 +753,9 @@ class DynamicTableState extends State<DynamicTable> {
             ),
           ),
           
-          // Custom pagination controls
-          _buildPaginationControls(),
+          // Only show pagination controls if pagination is enabled
+          if (widget.enablePagination)
+            _buildPaginationControls(),
         ],
       ),
     );
@@ -770,9 +777,12 @@ class DynamicTableState extends State<DynamicTable> {
   List<DataRow2> _getDataTable2Rows() {
     List<DataRow2> rows = [];
     
-    // Get the current page of data
-    int startIndex = _currentPage * effectiveRowsPerPage;
-    int endIndex = startIndex + effectiveRowsPerPage;
+    // Get the current page of data or all data if pagination is disabled
+    int startIndex = widget.enablePagination ? _currentPage * effectiveRowsPerPage : 0;
+    int endIndex = widget.enablePagination 
+        ? startIndex + effectiveRowsPerPage 
+        : _source.rowCount;
+    
     if (endIndex > _source.rowCount) endIndex = _source.rowCount;
     
     for (int i = startIndex; i < endIndex; i++) {
@@ -1029,6 +1039,10 @@ class DynamicTableState extends State<DynamicTable> {
   int get startIndex => _currentPage * effectiveRowsPerPage;
   int get endIndex => math.min(startIndex + effectiveRowsPerPage, _source.rowCount);
   int get effectiveRowsPerPage {
+    if (!widget.enablePagination) {
+      return _source.rowCount;
+    }
+    
     if (widget.showOnlyNonEmptyRows) {
       // Count how many rows actually have data
       int dataRowCount = _source.data.where((row) {

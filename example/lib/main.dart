@@ -348,6 +348,7 @@ class _MyAppState extends State<MyApp> {
                     deleteButtonColor: Colors.blue,
                     columnSpacing: 56.0,
                     horizontalMargin: 10.0,
+                    enablePagination: false,
                     actions: [
                       // Add Edit All button
                       ElevatedButton.icon(
