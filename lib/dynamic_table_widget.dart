@@ -784,8 +784,132 @@ class DynamicTableState extends State<DynamicTable> {
         if (!hasData && !_source.data[i].isEditing) continue;
       }
       
+      List<DataCell> cells = [];
+      // Add cells for each column
+      for (int j = 0; j < _source.data[i].cells.length; j++) {
+        // Check if the column is editable
+        bool isColumnEditable = j < _columns.length && _columns[j].isEditable;
+        
+        if (_source.data[i].isEditing && isColumnEditable) {
+          // Create editable cell for editable columns
+          final currentValue = _source.getEditedRowValues(i)[j];
+          final textController = TextEditingController(
+            text: currentValue != null ? currentValue.toString() : '',
+          );
+          
+          cells.add(
+            DataCell(
+              TextField(
+                controller: textController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                ),
+                onChanged: (value) {
+                  // Update the editing value
+                  _source.updateEditingValue(i, j, value);
+                },
+              ),
+              showEditIcon: false,
+            ),
+          );
+        } else {
+          // Create regular cell for non-editable columns or when not in edit mode
+          cells.add(
+            DataCell(
+              Text(
+                _source.data[i].cells[j].value != null 
+                    ? _source.data[i].cells[j].value.toString() 
+                    : '',
+              ),
+            ),
+          );
+        }
+      }
+
+      // Add action cell if needed
+      if (widget.showActions || widget.showDeleteAction) {
+        cells.add(
+          DataCell(
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (_source.data[i].isEditing)
+                  // Save button
+                  IconButton(
+                    icon: Icon(Icons.save, color: widget.saveButtonColor),
+                    onPressed: () {
+                      saveRow(i);
+                    },
+                  ),
+                if (_source.data[i].isEditing)
+                  // Cancel button
+                  IconButton(
+                    icon: Icon(Icons.cancel, color: widget.cancelButtonColor),
+                    onPressed: () {
+                      setState(() {
+                        _source.data[i].isEditing = false;
+                        // Remove any editing values
+                        _source.cancelEdit(i);
+                      });
+                    },
+                  ),
+                if (!_source.data[i].isEditing)
+                  // Edit button
+                  IconButton(
+                    icon: Icon(Icons.edit, color: widget.editButtonColor),
+                    onPressed: () {
+                      setState(() {
+                        // Get current row values
+                        List<dynamic> rowValues = _source.getRowValues(i);
+                        
+                        // Check if onRowEdit callback exists and allows editing
+                        bool canEdit = true;
+                        if (widget.onRowEdit != null) {
+                          canEdit = widget.onRowEdit!(i, rowValues);
+                        }
+                        
+                        if (canEdit) {
+                          // Set row to edit mode
+                          _source.data[i].isEditing = true;
+                          
+                          // Initialize editing values with current values
+                          _source.initializeEditingValues(i, rowValues);
+                          
+                          // Force rebuild
+                          setState(() {});
+                        }
+                      });
+                    },
+                  ),
+                if (!_source.data[i].isEditing && widget.showDeleteAction)
+                  // Delete button
+                  IconButton(
+                    icon: Icon(Icons.delete, color: widget.deleteButtonColor),
+                    onPressed: () {
+                      if (widget.onRowDelete != null) {
+                        List<dynamic> rowValues = _source.getRowValues(i);
+                        bool canDelete = widget.onRowDelete!(i, rowValues);
+                        if (canDelete) {
+                          setState(() {
+                            _source.deleteRow(i);
+                          });
+                        }
+                      } else {
+                        setState(() {
+                          _source.deleteRow(i);
+                        });
+                      }
+                    },
+                  ),
+              ],
+            ),
+          ),
+        );
+      }
+      
       rows.add(DataRow2(
-        cells: _source.getRow(i)?.cells ?? [],
+        cells: cells,
         selected: _source.data[i].selected,
         onSelectChanged: _source.data[i].isSelectable 
             ? (selected) => _source.selectRow(i, isSelected: selected ?? false)
@@ -956,14 +1080,31 @@ class DynamicTableState extends State<DynamicTable> {
       List<dynamic> oldValues = _source.getRowValues(index);
       List<dynamic> newValues = _source.getEditedRowValues(index);
       
+      // Process values through callback if provided
+      List<dynamic> valuesToSave = newValues;
       if (widget.onRowSave != null) {
         List<dynamic>? result = widget.onRowSave!(index, oldValues, newValues);
         if (result != null) {
-          _source.saveRow(index, result);
+          valuesToSave = result;
+        } else {
+          // If callback returns null, don't save
+          return;
         }
-      } else {
-        _source.saveRow(index, newValues);
       }
+      
+      // Update the UI state
+      setState(() {
+        // Update cell values
+        for (int j = 0; j < valuesToSave.length && j < _source.data[index].cells.length; j++) {
+          _source.data[index].cells[j].value = valuesToSave[j];
+        }
+        
+        // Exit edit mode
+        _source.data[index].isEditing = false;
+        
+        // Clear editing values
+        _source.cancelEdit(index);
+      });
     }
   }
 }

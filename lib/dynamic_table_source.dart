@@ -537,13 +537,22 @@ class DynamicTableSource extends DataTableSource {
     return getRowValues(index);
   }
   
-  /// Saves the edited values to a row
+  /// Saves the edited values for a row
   void saveRow(int index, List<dynamic> values) {
-    for (int i = 0; i < values.length && i < data[index].cells.length; i++) {
-      data[index].cells[i].value = values[i];
+    if (index >= 0 && index < data.length) {
+      // Update the cells with new values
+      for (int i = 0; i < values.length && i < data[index].cells.length; i++) {
+        data[index].cells[i].value = values[i];
+      }
+      
+      // Clear editing state
+      data[index].isEditing = false;
+      if (_editingValues.containsKey(index)) {
+        _editingValues.remove(index);
+      }
+      
+      notifyListeners();
     }
-    data[index].isEditing = false;
-    notifyListeners();
   }
 
   /// Initialize editing values for a row with its current values
@@ -551,6 +560,26 @@ class DynamicTableSource extends DataTableSource {
     if (index >= 0 && index < data.length) {
       _editingValues[index] = List.from(values);
       notifyListeners();
+    }
+  }
+
+  /// Cancels editing for a row
+  void cancelEdit(int index) {
+    if (_editingValues.containsKey(index)) {
+      _editingValues.remove(index);
+    }
+    notifyListeners();
+  }
+
+  /// Updates a specific editing value
+  void updateEditingValue(int rowIndex, int columnIndex, dynamic value) {
+    if (!_editingValues.containsKey(rowIndex)) {
+      // Initialize with current values if not already initialized
+      _editingValues[rowIndex] = getRowValues(rowIndex);
+    }
+    
+    if (columnIndex < _editingValues[rowIndex]!.length) {
+      _editingValues[rowIndex]![columnIndex] = value;
     }
   }
 }
