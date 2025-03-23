@@ -664,82 +664,138 @@ class DynamicTableState extends State<DynamicTable> {
       effectiveRowsPerPage = dataRowCount > 0 ? dataRowCount : 1;
     }
     
-    // Replace PaginatedDataTable with DataTable2
+    // Create the table content
+    Widget tableContent = DataTable2(
+      columns: _getDataTable2Columns(),
+      rows: _getDataTable2Rows(),
+      scrollController: _scrollController,
+      sortColumnIndex: widget.sortColumnIndex,
+      sortAscending: widget.sortAscending,
+      dataRowHeight: widget.dataRowMaxHeight,
+      headingRowHeight: widget.headingRowHeight,
+      horizontalMargin: widget.horizontalMargin,
+      columnSpacing: widget.columnSpacing,
+      showCheckboxColumn: widget.showCheckboxColumn,
+      dividerThickness: widget.dividerThickness,
+      border: TableBorder(
+        horizontalInside: BorderSide(
+          color: widget.dividerColor ?? theme.dividerColor,
+          width: widget.dividerThickness ?? 1.0,
+        ),
+      ),
+      onSelectAll: (value) {
+        selectAllRows(isSelected: value ?? false);
+        widget.onSelectAll?.call(value);
+      },
+      checkboxHorizontalMargin: widget.checkboxHorizontalMargin,
+    );
+    
+    // Create the full widget with header and pagination
     final tableWidget = Card(
       color: widget.backgroundColor,
       elevation: 0,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (widget.header != null || (widget.showAddRowButton || widget.actions != null))
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  if (widget.header != null) 
-                    Expanded(child: Center(child: widget.header)),
-                  if (widget.showAddRowButton || widget.actions != null)
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // Use a Column with Expanded when we have a constrained height
+          if (constraints.maxHeight.isFinite) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (widget.header != null || (widget.showAddRowButton || widget.actions != null))
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        if (widget.showAddRowButton)
-                          ElevatedButton.icon(
-                            icon: Icon(Icons.add, color: widget.addButtonTextColor),
-                            label: Text(widget.addButtonText ?? "Add Row", 
-                                style: TextStyle(color: widget.addButtonTextColor)),
-                            onPressed: () {
-                              widget.onAddRowButtonPress != null 
-                                  ? widget.onAddRowButtonPress?.call() 
-                                  : addRow();
-                            },
-                            style: widget.addButtonColor != null 
-                                ? ButtonStyle(
-                                    backgroundColor: WidgetStateProperty.all(widget.addButtonColor),
-                                  ) 
-                                : null,
+                        if (widget.header != null) 
+                          Expanded(child: Center(child: widget.header)),
+                        if (widget.showAddRowButton || widget.actions != null)
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (widget.showAddRowButton)
+                                ElevatedButton.icon(
+                                  icon: Icon(Icons.add, color: widget.addButtonTextColor),
+                                  label: Text(widget.addButtonText ?? "Add Row", 
+                                      style: TextStyle(color: widget.addButtonTextColor)),
+                                  onPressed: () {
+                                    widget.onAddRowButtonPress != null 
+                                        ? widget.onAddRowButtonPress?.call() 
+                                        : addRow();
+                                  },
+                                  style: widget.addButtonColor != null 
+                                      ? ButtonStyle(
+                                          backgroundColor: WidgetStateProperty.all(widget.addButtonColor),
+                                        ) 
+                                      : null,
+                                ),
+                              if (widget.actions != null) ...widget.actions!,
+                            ],
                           ),
-                        if (widget.actions != null) ...widget.actions!,
                       ],
                     ),
-                ],
-              ),
-            ),
-          
-          // Replace Expanded with a Container with fixed height or SizedBox
-          Container(
-            height: 150,
-            child: DataTable2(
-              columns: _getDataTable2Columns(),
-              rows: _getDataTable2Rows(),
-              scrollController: _scrollController,
-              sortColumnIndex: widget.sortColumnIndex,
-              sortAscending: widget.sortAscending,
-              dataRowHeight: widget.dataRowMaxHeight,
-              headingRowHeight: widget.headingRowHeight,
-              horizontalMargin: widget.horizontalMargin,
-              columnSpacing: widget.columnSpacing,
-              showCheckboxColumn: widget.showCheckboxColumn,
-              dividerThickness: widget.dividerThickness,
-              border: TableBorder(
-                horizontalInside: BorderSide(
-                  color: widget.dividerColor ?? theme.dividerColor,
-                  width: widget.dividerThickness ?? 1.0,
+                  ),
+                
+                // Use Expanded to take remaining space
+                Expanded(child: tableContent),
+                
+                if (widget.enablePagination)
+                  _buildPaginationControls(),
+              ],
+            );
+          } else {
+            // Use a Column with intrinsic sizing when height is unconstrained
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (widget.header != null || (widget.showAddRowButton || widget.actions != null))
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        if (widget.header != null) 
+                          Expanded(child: Center(child: widget.header)),
+                        if (widget.showAddRowButton || widget.actions != null)
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (widget.showAddRowButton)
+                                ElevatedButton.icon(
+                                  icon: Icon(Icons.add, color: widget.addButtonTextColor),
+                                  label: Text(widget.addButtonText ?? "Add Row", 
+                                      style: TextStyle(color: widget.addButtonTextColor)),
+                                  onPressed: () {
+                                    widget.onAddRowButtonPress != null 
+                                        ? widget.onAddRowButtonPress?.call() 
+                                        : addRow();
+                                  },
+                                  style: widget.addButtonColor != null 
+                                      ? ButtonStyle(
+                                          backgroundColor: WidgetStateProperty.all(widget.addButtonColor),
+                                        ) 
+                                      : null,
+                                ),
+                              if (widget.actions != null) ...widget.actions!,
+                            ],
+                          ),
+                      ],
+                    ),
+                  ),
+                
+                // Use a container with reasonable default height
+                SizedBox(
+                  height: 400, // Default height that can be overridden by parent constraints
+                  child: tableContent,
                 ),
-              ),
-              onSelectAll: (value) {
-                selectAllRows(isSelected: value ?? false);
-                widget.onSelectAll?.call(value);
-              },
-              checkboxHorizontalMargin: widget.checkboxHorizontalMargin,
-            ),
-          ),
-          
-          // Only show pagination controls if pagination is enabled
-          if (widget.enablePagination)
-            _buildPaginationControls(),
-        ],
+                
+                if (widget.enablePagination)
+                  _buildPaginationControls(),
+              ],
+            );
+          }
+        },
       ),
     );
     

@@ -414,12 +414,12 @@ class _MyAppState extends State<MyApp> {
                                     yourListOfMaps.add({'route': '${yourListOfMaps.length + 1}', 'score': ""});
                                     _tableKey.currentState?.addRowWithValues(yourListOfMaps.last.values.toList(), isEditing: true, addRowToEnd: true);
                                   }
-                                   if (numberOfRows > 0) {
+                                  if (numberOfRows > 0) {
                                     WidgetsBinding.instance.addPostFrameCallback((_) {
                                       _tableKey.currentState?.scrollToRow(lastRowIndex);
                                     });
                                   }
-                                  
+
                                   Navigator.of(context).pop();
                                 },
                                 child: const Text("Add"),
