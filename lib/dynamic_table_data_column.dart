@@ -64,6 +64,8 @@ class DynamicTableDataColumn {
   /// Whether this column is a DateTime column.
   final bool isDateTimeColumn;
 
+  /// Whether this column is a dropdown column.
+  final bool isDropdownColumn;
   /// Creates the configuration for a column of a [DynamicTable].
   ///
   /// The [label] argument must not be null.
@@ -77,5 +79,6 @@ class DynamicTableDataColumn {
       this.isEditable = true,
       required this.dynamicTableInputType,
       this.size,
-      this.isDateTimeColumn = false});
+      this.isDateTimeColumn = false,
+      this.isDropdownColumn = false});
 }

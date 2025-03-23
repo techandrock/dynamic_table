@@ -541,6 +541,8 @@ class DynamicTableState extends State<DynamicTable> {
       ColumnSize columnSize;
       if (e.isDateTimeColumn) {
         columnSize = ColumnSize.L;
+      } else if (e.isDropdownColumn) {
+        columnSize = ColumnSize.M;
       } else {
         columnSize = e.size ?? ColumnSize.S;
       }
@@ -678,7 +680,7 @@ class DynamicTableState extends State<DynamicTable> {
       columns: _getDataTable2Columns(),
       rows: _getDataTable2Rows(),
       lmRatio: 2.0,
-      smRatio: 1.5,
+      smRatio: 0.6,
       scrollController: _scrollController,
       sortColumnIndex: widget.sortColumnIndex,
       sortAscending: widget.sortAscending,

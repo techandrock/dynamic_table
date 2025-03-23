@@ -289,6 +289,7 @@ class _MyAppState extends State<MyApp> {
                       ),
                       DynamicTableDataColumn(
                         label: const Text("Gender"),
+                        isDropdownColumn: true,
                         dynamicTableInputType: DynamicTableInputType.dropDown<String>(
                           focusedBorderColor: Colors.green,
                           textColor: Colors.white,
