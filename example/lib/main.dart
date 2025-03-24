@@ -152,8 +152,7 @@ class _MyAppState extends State<MyApp> {
                       myData.removeAt(index);
                       return true;
                     },
-                    onRowSave: (index, old, newValue) {
-                      
+                    onRowSave: (index, old, newValue) {                      
                       // Validation checks
                       if (newValue[0] == null) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -207,6 +206,7 @@ class _MyAppState extends State<MyApp> {
                         ),
                       );
                     },
+                    
                     onRowsPerPageChanged: (value) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -240,6 +240,7 @@ class _MyAppState extends State<MyApp> {
                     columns: [
                       DynamicTableDataColumn(
                           label: const Text("Name"),
+                          isVisible: false,
                           onSort: (columnIndex, ascending) {},
                           dynamicTableInputType: DynamicTableInputType.text(
                             focusedBorderColor: Colors.red,

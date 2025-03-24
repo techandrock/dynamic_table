@@ -66,19 +66,30 @@ class DynamicTableDataColumn {
 
   /// Whether this column is a dropdown column.
   final bool isDropdownColumn;
+  
+  /// Whether this column is visible in the table.
+  /// 
+  /// If true, the column will be displayed.
+  /// If false, the column will be hidden.
+  /// 
+  /// Default value is true.
+  final bool isVisible;
+
   /// Creates the configuration for a column of a [DynamicTable].
   ///
   /// The [label] argument must not be null.
   /// The column heading.
   ///
-  const DynamicTableDataColumn(
-      {required this.label,
-      this.tooltip,
-      this.numeric = false,
-      this.onSort,
-      this.isEditable = true,
-      required this.dynamicTableInputType,
-      this.size,
-      this.isDateTimeColumn = false,
-      this.isDropdownColumn = false});
+  const DynamicTableDataColumn({
+    required this.label,
+    this.tooltip,
+    this.numeric = false,
+    this.onSort,
+    this.isEditable = true,
+    required this.dynamicTableInputType,
+    this.size,
+    this.isDateTimeColumn = false,
+    this.isDropdownColumn = false,
+    this.isVisible = true,
+  });
 }

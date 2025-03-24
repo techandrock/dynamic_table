@@ -537,13 +537,17 @@ class DynamicTableState extends State<DynamicTable> {
   late DynamicTableSource _source;
 
   List<DynamicTableDataColumn> _columns = [];
+  List<DynamicTableDataColumn> _visibleColumns = [];
 
   void _buildColumns() {
     _columns = [...widget.columns];
+    
+    // Filter out hidden columns to create the visible columns list
+    _visibleColumns = _columns.where((column) => column.isVisible).toList();
   }
 
   List<DataColumn2> _getDataTable2Columns() {
-    List<DataColumn2> columnList = _columns.map((e) {
+    List<DataColumn2> columnList = _visibleColumns.map((e) {
       ColumnSize columnSize;
       if (e.isDateTimeColumn) {
         columnSize = ColumnSize.L;
@@ -960,7 +964,11 @@ class DynamicTableState extends State<DynamicTable> {
       
       List<DataCell> cells = [];
       // Add cells for each column
+      int visibleColumnIndex = 0;
       for (int j = 0; j < _source.data[i].cells.length; j++) {
+        // Skip hidden columns
+        if (j < _columns.length && !_columns[j].isVisible) continue;
+        
         // Check if the column is editable
         bool isColumnEditable = j < _columns.length && _columns[j].isEditable;
         
@@ -992,6 +1000,7 @@ class DynamicTableState extends State<DynamicTable> {
             ),
           );
         }
+        visibleColumnIndex++;
       }
 
       // Add action cell if needed
@@ -1370,5 +1379,61 @@ class DynamicTableState extends State<DynamicTable> {
     
     // Then return all data as JSON
     return getAllRowsAsJson();
+  }
+
+  // Method to toggle column visibility
+  void toggleColumnVisibility(int columnIndex) {
+    if (columnIndex < 0 || columnIndex >= _columns.length) return;
+    
+    setState(() {
+      // Create a new column with toggled visibility
+      final column = _columns[columnIndex];
+      final updatedColumn = DynamicTableDataColumn(
+        label: column.label,
+        tooltip: column.tooltip,
+        numeric: column.numeric,
+        onSort: column.onSort,
+        isEditable: column.isEditable,
+        dynamicTableInputType: column.dynamicTableInputType,
+        size: column.size,
+        isDateTimeColumn: column.isDateTimeColumn,
+        isDropdownColumn: column.isDropdownColumn,
+        isVisible: !column.isVisible, // Toggle visibility
+      );
+      
+      // Replace the column in the list
+      _columns[columnIndex] = updatedColumn;
+      
+      // Rebuild visible columns list
+      _visibleColumns = _columns.where((column) => column.isVisible).toList();
+    });
+  }
+
+  // Method to update column visibility
+  void setColumnVisibility(int columnIndex, bool isVisible) {
+    if (columnIndex < 0 || columnIndex >= _columns.length) return;
+    
+    setState(() {
+      // Create a new column with updated visibility
+      final column = _columns[columnIndex];
+      final updatedColumn = DynamicTableDataColumn(
+        label: column.label,
+        tooltip: column.tooltip,
+        numeric: column.numeric,
+        onSort: column.onSort,
+        isEditable: column.isEditable,
+        dynamicTableInputType: column.dynamicTableInputType,
+        size: column.size,
+        isDateTimeColumn: column.isDateTimeColumn,
+        isDropdownColumn: column.isDropdownColumn,
+        isVisible: isVisible, // Set visibility
+      );
+      
+      // Replace the column in the list
+      _columns[columnIndex] = updatedColumn;
+      
+      // Rebuild visible columns list
+      _visibleColumns = _columns.where((column) => column.isVisible).toList();
+    });
   }
 }
