@@ -30,6 +30,10 @@ class _MyAppState extends State<MyApp> {
     {'route': '3', 'score': 300},
   ];
 
+  List<Map<String, dynamic>> genderList = [
+    {'value': '1', 'label': 'Male', 'icon': Icon(Icons.male)},
+    {'value': '2', 'label': 'Female', 'icon': Icon(Icons.female)},
+  ];
 
 
   @override
@@ -132,16 +136,16 @@ class _MyAppState extends State<MyApp> {
                       },
                     );
                     },
-                    onRowEdit: (index, row) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text("Row Edited index:$index row:$row"),
-                        ),
-                      );
-                      myData[index] = row;
+                    // onRowEdit: (index, row) {
+                    //   ScaffoldMessenger.of(context).showSnackBar(
+                    //     SnackBar(
+                    //       content: Text("Row Edited index:$index row:$row"),
+                    //     ),
+                    //   );
+                    //   myData[index] = row;
                       
-                      return true;
-                    },
+                    //   return true;
+                    // },
                   
                     onRowDelete: (index, row) {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -152,35 +156,47 @@ class _MyAppState extends State<MyApp> {
                       myData.removeAt(index);
                       return true;
                     },
-                    onRowSave: (index, old, newValue) {                      
-                      // Validation checks
-                      if (newValue[0] == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Name cannot be null")),
-                        );
-                        return null;
-                      }
+                    // onRowSave: (index, old, newValue) {                      
+                    //   // Validation checks
+                    //   if (newValue[0] == null) {
+                    //     ScaffoldMessenger.of(context).showSnackBar(
+                    //       const SnackBar(content: Text("Name cannot be null")),
+                    //     );
+                    //     return null;
+                    //   }
                       
-                      if (newValue[0].toString().length < 3) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Name must be atleast 3 characters long")),
-                        );
-                        return null;
-                      }
+                    //   if (newValue[0].toString().length < 3) {
+                    //     ScaffoldMessenger.of(context).showSnackBar(
+                    //       const SnackBar(content: Text("Name must be atleast 3 characters long")),
+                    //     );
+                    //     return null;
+                    //   }
+
+                    //   String genderLabel = newValue[3];
+                    //   String genderValue = '';
+                    //   if (genderLabel.isNotEmpty) {
+                    //     for (var item in genderList) {
+                    //       if (item['label'] == genderLabel) {
+                    //         genderValue = item['value'];
+                    //       }
+                    //     }
+                    //   }
                       
-                      // Create a Map to return instead of the List
-                      Map<String, dynamic> rowData = {
-                        'Name': newValue[0],
-                        'Unique ID': newValue[1] ?? Random().nextInt(500).toString(),
-                        'Birth Date': newValue[2],
-                        'Gender': newValue[3],
-                        'Other Info': newValue[4],
-                      };
                       
-                      // Update your data
-                      myData[index] = newValue.toList(); // Keep your existing data structure
-                      return rowData; // Return the Map
-                    },
+                    //   // Create a Map to return instead of the List
+                    //   Map<String, dynamic> rowData = {
+                    //     'Name': newValue[0],
+                    //     'Unique ID': newValue[1] ?? Random().nextInt(500).toString(),
+                    //     'Birth Date': newValue[2],
+                    //     'Gender': genderValue,
+                    //     'Other Info': newValue[4],
+                    //   };
+                    //   print("rowData: $rowData");
+                      
+                    //   // Update your data
+                    //   myData[index] = newValue.toList(); // Keep your existing data structure
+                    //   return rowData; // Return the Map
+                    // },
                     showActions: true,
                     showAddRowButton: true,
                     showDeleteAction: true,
@@ -278,11 +294,7 @@ class _MyAppState extends State<MyApp> {
                         dynamicTableInputType: DynamicTableInputType.selectFormField(
                           focusedBorderColor: Colors.green,
                           textColor: Colors.white,
-                          items: [
-                            {'value': '1', 'label': 'Male', 'icon': Icon(Icons.male)},
-                            {'value': '2', 'label': 'Female', 'icon': Icon(Icons.female)},
-                            {'value': '3', 'label': 'Other', 'icon': Icon(Icons.person)},
-                          ],
+                          items: genderList,
                          
                           decoration: const InputDecoration(
                               hintText: "Select Gender",
