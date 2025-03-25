@@ -275,26 +275,19 @@ class _MyAppState extends State<MyApp> {
                       DynamicTableDataColumn(
                         label: const Text("Gender"),
                         isDropdownColumn: true,
-                        dynamicTableInputType: DynamicTableInputType.dropDown<String>(
+                        dynamicTableInputType: DynamicTableInputType.selectFormField(
                           focusedBorderColor: Colors.green,
                           textColor: Colors.white,
-                          items: genderDropdown
-                              .map((e) => DropdownMenuItem(
-                                    value: e,
-                                    child: Text(e),
-                                  ))
-                              .toList(growable: false),
-                          selectedItemBuilder: (context) {
-                            return genderDropdown
-                                .map((e) => Text(e))
-                                .toList(growable: false);
-                          },
+                          items: [
+                            {'value': '1', 'label': 'Male', 'icon': Icon(Icons.male)},
+                            {'value': '2', 'label': 'Female', 'icon': Icon(Icons.female)},
+                            {'value': '3', 'label': 'Other', 'icon': Icon(Icons.person)},
+                          ],
+                         
                           decoration: const InputDecoration(
                               hintText: "Select Gender",
                               border: OutlineInputBorder()),
-                          displayBuilder: (value) =>
-                              value ??
-                              "", // How the string will be displayed in non editing mode
+
                         ),
                       ),
                       DynamicTableDataColumn(

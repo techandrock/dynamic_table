@@ -9,7 +9,10 @@ part 'dynamic_table_actions_input.dart';
 part 'dynamic_table_autocomplete_input.dart';
 part 'dynamic_table_dependent_dropdown.dart';
 part 'dynamic_table_datetime_input.dart';
+part 'dynamic_table_select_form_field.dart';
 
+// Define the enum here since we're not importing it
+enum SelectFormFieldType { dropdown, dialog }
 
 abstract class DynamicTableInputType<T extends Object> {
   /// The value to display when the value is null (currently not usign this).
@@ -311,6 +314,49 @@ static DynamicTableDateTimeInput dateTime({
     timePickerEntryMode: timePickerEntryMode,
     iconColor: iconColor,
     focusedBorderColor: focusedBorderColor,
+    );
+  }
+
+  /// Map Dropdown Input for the [DynamicTable] using SelectFormField.
+  ///
+  /// This allows you to use a list of Map<String, dynamic> objects as dropdown items,
+  /// with more customization options than the standard dropdown.
+  ///
+  /// [items] is the list of Map<String, dynamic> objects to display in the dropdown.
+  /// Each item should have 'value' and 'label' keys, and optionally 'icon' and other properties.
+  static DynamicTableInputType<String> selectFormField({
+    required List<Map<String, dynamic>> items,
+    SelectFormFieldType type = SelectFormFieldType.dropdown,
+    Widget? icon,
+    bool changeIcon = false,
+    String? labelText,
+    String? hintText,
+    String? dialogTitle,
+    String? dialogSearchHint,
+    String? dialogCancelBtn,
+    bool enableSearch = false,
+    TextStyle? style,
+    InputDecoration? decoration,
+    ValueChanged<String>? onChanged,
+    Color? textColor,
+    Color? focusedBorderColor,
+  }) {
+    return _DynamicTableSelectFormField(
+      items: items,
+      type: type,
+      icon: icon,
+      changeIcon: changeIcon,
+      labelText: labelText,
+      hintText: hintText,
+      dialogTitle: dialogTitle,
+      dialogSearchHint: dialogSearchHint,
+      dialogCancelBtn: dialogCancelBtn,
+      enableSearch: enableSearch,
+      style: style,
+      decoration: decoration,
+      onChanged: onChanged,
+      textColor: textColor,
+      focusedBorderColor: focusedBorderColor,
     );
   }
 }
