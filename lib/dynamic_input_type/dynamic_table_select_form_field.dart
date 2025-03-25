@@ -37,54 +37,96 @@ class _DynamicTableSelectFormField extends DynamicTableInputType<String> {
 
   @override
   Widget displayWidget(String? value) {
-    // Find the item with matching value
-    final item = value != null 
-        ? items.firstWhere(
-            (item) => item['value'].toString() == value,
-            orElse: () => {'label': value},
-          )
-        : null;
+    // Find the label for the current value
+    String displayText = '';
+    if (value != null && value.isNotEmpty) {
+      // First try to find the value in the items list
+      bool foundInItems = false;
+      for (var item in items) {
+        if (item['value'].toString() == value) {
+          displayText = item['label']?.toString() ?? value;
+          foundInItems = true;
+          break;
+        }
+      }
+      
+      // If not found in items, just display the value directly
+      if (!foundInItems) {
+        displayText = value;
+      }
+    } else {
+      // Show a placeholder or the first item's label if no value is selected
+      displayText = hintText ?? (items.isNotEmpty ? items.first['label']?.toString() ?? '' : '');
+    }
     
-    // Display the label of the selected item
-    final displayText = item != null 
-        ? (item['label']?.toString() ?? item['value']?.toString() ?? '')
-        : '';
-    
-    return Text(
-      displayText,
-      style: style?.copyWith(color: textColor) ?? TextStyle(color: textColor),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      alignment: Alignment.centerLeft,
+      child: Text(
+        displayText,
+        style: style ?? TextStyle(color: textColor),
+      ),
     );
   }
 
   @override
-  Widget editingWidget(String? value, Function(String value, int row, int column)? onChanged, int row, int column) {
-    final effectiveDecoration = decoration?.copyWith(
-      focusedBorder: focusedBorderColor != null
-          ? OutlineInputBorder(
-              borderSide: BorderSide(color: focusedBorderColor!),
-            )
-          : decoration?.focusedBorder,
-    );
-
-    return _CustomSelectFormField(
-      type: type,
-      initialValue: value,
-      icon: icon,
-      changeIcon: changeIcon,
-      labelText: labelText,
-      hintText: hintText,
-      dialogTitle: dialogTitle,
-      dialogSearchHint: dialogSearchHint,
-      dialogCancelBtn: dialogCancelBtn,
-      enableSearch: enableSearch,
-      items: items,
-      style: style,
-      decoration: effectiveDecoration,
-      onChanged: (newValue) {
-        if (onChanged != null && newValue != null) {
-          onChanged(newValue, row, column);
+  Widget editingWidget(String? value, Function(String?, int, int)? onChanged, int row, int column) {
+    // Ensure we have unique values in our dropdown items
+    final Map<String, DropdownMenuItem<String>> uniqueItems = {};
+    
+    for (var item in items) {
+      final itemValue = item['value'].toString();
+      if (!uniqueItems.containsKey(itemValue)) {
+        uniqueItems[itemValue] = DropdownMenuItem<String>(
+          value: itemValue,
+          child: Text(item['label']?.toString() ?? itemValue),
+        );
+      }
+    }
+    
+    // Check if the value exists directly in the items
+    String? selectedValue = null;
+    
+    if (value != null && value.isNotEmpty) {
+      // First check if the value matches any item's 'value' property
+      for (var item in items) {
+        if (item['value'].toString() == value) {
+          selectedValue = value;
+          break;
         }
-      },
+      }
+      
+      // If not found by value, check if it matches any item's 'label' property
+      if (selectedValue == null) {
+        for (var item in items) {
+          if (item['label'].toString() == value) {
+            selectedValue = item['value'].toString();
+            break;
+          }
+        }
+      }
+      
+      // If still not found but the value exists in uniqueItems, use it directly
+      if (selectedValue == null && uniqueItems.containsKey(value)) {
+        selectedValue = value;
+      }
+    }
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: DropdownButtonFormField<String>(
+        value: selectedValue,
+        decoration: const InputDecoration(
+          border: InputBorder.none,
+          contentPadding: EdgeInsets.zero,
+        ),
+        items: uniqueItems.values.toList(),
+        onChanged: (String? newValue) {
+          if (onChanged != null) {
+            onChanged(newValue, row, column);
+          }
+        },
+      ),
     );
   }
 
