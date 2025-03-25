@@ -116,6 +116,8 @@ class _DynamicTableSelectFormField extends DynamicTableInputType<String> {
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: DropdownButtonFormField<String>(
         value: selectedValue,
+        style: style ?? TextStyle(color: textColor),
+        dropdownColor: Colors.black,
         decoration: const InputDecoration(
           border: InputBorder.none,
           contentPadding: EdgeInsets.zero,
