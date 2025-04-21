@@ -445,14 +445,6 @@ class DynamicTableState extends State<DynamicTable> {
       
       if (addRowToEnd) {
         _source.data.add(newRow);
-        // Schedule scrolling after the frame is rendered
-        // WidgetsBinding.instance.addPostFrameCallback((_) {
-        //   _scrollController.animateTo(
-        //     _scrollController.position.maxScrollExtent,
-        //     duration: const Duration(milliseconds: 300),
-        //     curve: Curves.easeOut,
-        //   );
-        // });
       } else {
         _source.data.insert(0, newRow);
       }
@@ -471,7 +463,8 @@ class DynamicTableState extends State<DynamicTable> {
       );
       
       if (addRowToEnd) {
-        _source.data.add(newRow);
+        //_source.data.add(newRow);
+        _source.insertRow(_source.data.length, values, isEditing: isEditing);
       } else {
         _source.data.insert(0, newRow);
       }
@@ -1025,7 +1018,7 @@ class DynamicTableState extends State<DynamicTable> {
                     onPressed: () {
                       setState(() {
                         _source.data[i].isEditing = false;
-                        // Remove any editing values
+                        // This will now handle unsaved rows properly
                         _source.cancelEdit(i);
                       });
                     },

@@ -563,12 +563,21 @@ class DynamicTableSource extends DataTableSource {
     }
   }
 
-  /// Cancels editing for a row
-  void cancelEdit(int index) {
+  /// Cancels editing for a row and deletes the row if it was unsaved
+  bool cancelEdit(int index) {
+    bool isUnsaved = _unsavedRows.contains(index);
+    
     if (_editingValues.containsKey(index)) {
       _editingValues.remove(index);
     }
+    
+    if (isUnsaved) {
+      _unsavedRows.remove(index);
+      deleteRow(index);
+    }
+    
     notifyListeners();
+    return isUnsaved; // Return whether the row was deleted
   }
 
   /// Updates a specific editing value
